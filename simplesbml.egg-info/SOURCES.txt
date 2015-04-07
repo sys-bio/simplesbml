@@ -1,0 +1,7 @@
+setup.py
+simplesbml/__init__.py
+simplesbml.egg-info/PKG-INFO
+simplesbml.egg-info/SOURCES.txt
+simplesbml.egg-info/dependency_links.txt
+simplesbml.egg-info/not-zip-safe
+simplesbml.egg-info/top_level.txt
