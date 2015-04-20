@@ -6,7 +6,7 @@ Created on Tue Jan 27 23:13:42 2015
 """
 
 import sys
-from libsbml import *
+import libsbml
 
 class sbmlModel(object):
             
@@ -15,12 +15,12 @@ class sbmlModel(object):
             raise SystemExit('LibSBML returned a null value trying to ' + \
                     message + '.')
         elif type(value) is int:
-            if value == LIBSBML_OPERATION_SUCCESS:
+            if value == libsbml.LIBSBML_OPERATION_SUCCESS:
                 return
             else:
                 err_msg = 'Error trying to ' + message + '.' \
                 + 'LibSBML returned error code ' + str(value) + ': "'\
-                + OperationReturnValue_toString(value).strip() + '"'
+                + libsbml.OperationReturnValue_toString(value).strip() + '"'
             raise SystemExit(err_msg)
         else:
             return
@@ -28,7 +28,7 @@ class sbmlModel(object):
     def __init__(self, time_units='second', extent_units='mole', \
                  sub_units='mole'):
         try:
-            self.document = SBMLDocument(3,1)
+            self.document = libsbml.SBMLDocument(3,1)
         except ValueError:
             raise SystemExit('Could not create SBMLDocument object')
         self.model = self.document.createModel()
@@ -42,7 +42,7 @@ class sbmlModel(object):
         self.check(per_second.setId('per_second'),     'set unit definition id')
         unit = per_second.createUnit()
         self.check(unit,                               'create unit on per_second')
-        self.check(unit.setKind(UNIT_KIND_SECOND),     'set unit kind')
+        self.check(unit.setKind(libsbml.UNIT_KIND_SECOND),     'set unit kind')
         self.check(unit.setExponent(-1),               'set unit exponent')
         self.check(unit.setScale(0),                   'set unit scale')
         self.check(unit.setMultiplier(1),              'set unit multiplier')
@@ -116,7 +116,7 @@ class sbmlModel(object):
             self.check(species_ref2.setConstant(True), \
                     'set "constant" on species ref 2')
          
-        math_ast = parseL3Formula(expression);
+        math_ast = libsbml.parseL3Formula(expression);
         self.check(math_ast,    'create AST for rate expression')
      
         kinetic_law = r1.createKineticLaw()
@@ -142,24 +142,24 @@ class sbmlModel(object):
         self.check(tri,  'add trigger to event');
         self.check(tri.setPersistent(persistent),   'set persistence of trigger');
         self.check(tri.setInitialValue(initial_value), 'set initial value of trigger');
-        tri_ast = parseL3Formula(trigger);
+        tri_ast = libsbml.parseL3Formula(trigger);
         self.check(tri.setMath(tri_ast),     'add formula to trigger');
         
         de = e1.createDelay();
         k = self.addParameter(event_id+'Delay', delay, self.model.getTimeUnits());
         self.check(de,               'add delay to event');
-        delay_ast = parseL3Formula(k.getId());
+        delay_ast = libsbml.parseL3Formula(k.getId());
         self.check(de.setMath(delay_ast),     'set formula for delay');
         
         for a in assignments.keys():          
             assign = e1.createEventAssignment();
             self.check(assign,   'add event assignment to event');
             self.check(assign.setVariable(a),  'add variable to event assignment');
-            val_ast = parseL3Formula(assignments.get(a));
+            val_ast = libsbml.parseL3Formula(assignments.get(a));
             self.check(assign.setMath(val_ast),    'add value to event assignment');
         
         pri = e1.createPriority();
-        pri_ast = parseL3Formula(str(priority));
+        pri_ast = libsbml.parseL3Formula(str(priority));
         self.check(pri.setMath(pri_ast), 'add priority to event');
         return e1
     
@@ -167,7 +167,7 @@ class sbmlModel(object):
         r = self.model.createAssignmentRule()
         self.check(r,                        'create assignment rule r')
         self.check(r.setVariable(var),          'set assignment rule variable')
-        math_ast = parseL3Formula(math);
+        math_ast = libsbml.parseL3Formula(math);
         self.check(r.setMath(math_ast), 'set assignment rule equation')
         return r
         
@@ -175,7 +175,7 @@ class sbmlModel(object):
         r = self.model.createRateRule()
         self.check(r,                        'create rate rule r')
         self.check(r.setVariable(var),          'set rate rule variable')
-        math_ast = parseL3Formula(math);
+        math_ast = libsbml.parseL3Formula(math);
         self.check(r.setMath(math_ast), 'set rate rule equation')
         return r
         
@@ -183,7 +183,7 @@ class sbmlModel(object):
         a = self.model.createInitialAssignment()
         self.check(a,   'create initial assignment a')
         self.check(a.setSymbol(symbol),    'set initial assignment a symbol')
-        math_ast = parseL3Formula(math);
+        math_ast = libsbml.parseL3Formula(math);
         self.check(a.setMath(math_ast),    'set initial assignment a math')
         return a
         
@@ -236,7 +236,7 @@ class sbmlModel(object):
         return self.model.getListOfInitialAssignments();  
                   
     def __repr__(self):
-        return writeSBMLToString(self.document)
+        return libsbml.writeSBMLToString(self.document)
         
 def writeCode(doc):
     comp_template = 'model.addCompartment(\'%s\');';
@@ -291,7 +291,7 @@ def writeCode(doc):
         products = [];
         for p in v.getListOfProducts():
             products.append(p.getSpecies());
-        expr = formulaToString(v.getKineticLaw().getMath());
+        expr = libsbml.formulaToString(v.getKineticLaw().getMath());
         local_ids = [];
         local_values = [];
         for k in v.getKineticLaw().getListOfLocalParameters():
@@ -305,44 +305,44 @@ def writeCode(doc):
         persistent = e.getTrigger().getPersistent();
         initialValue = e.getTrigger().getInitialValue();
         eid = e.getId();
-        priority = formulaToL3String(e.getPriority().getMath());
-        tri = formulaToL3String(e.getTrigger().getMath());
-        did = formulaToL3String(e.getDelay().getMath());
+        priority = libsbml.formulaToL3String(e.getPriority().getMath());
+        tri = libsbml.formulaToL3String(e.getTrigger().getMath());
+        did = libsbml.formulaToL3String(e.getDelay().getMath());
         delay = mod.getParameter(did).getValue();
         assigns = e.getListOfEventAssignments();
         var = [];
         values = [];
         for assign in assigns:
             var.append(assign.getVariable());
-            values.append(formulaToL3String(assign.getMath()));
+            values.append(libsbml.formulaToL3String(assign.getMath()));
         assigns = dict(zip(var, values));
         command_list.append(event_template % (tri, str(delay), str(assigns), \
                 str(persistent), str(initialValue), str(priority), eid));
     
     for r in rules:
         sym = r.getVariable();
-        math = formulaToL3String(r.getMath());
-        if r.getTypeCode() == SBML_ASSIGNMENT_RULE:
+        math = libsbml.formulaToL3String(r.getMath());
+        if r.getTypeCode() == libsbml.SBML_ASSIGNMENT_RULE:
             command_list.append(assignrule_template % (sym, math));
-        elif r.getTypeCode() == SBML_RATE_RULE:
+        elif r.getTypeCode() == libsbml.SBML_RATE_RULE:
             command_list.append(raterule_template % (sym, math));
         else:
             next
             
     for i in inits:
         sym = i.getSymbol();
-        math = formulaToL3String(i.getMath());
+        math = libsbml.formulaToL3String(i.getMath());
         command_list.append(initassign_template % (sym, math));
     
     commands = '\n'.join(command_list);
     return commands;
     
 def writeCodeFromFile(filename):
-    reader = SBMLReader();
+    reader = libsbml.SBMLReader();
     doc = reader.readSBMLFromFile(filename);
     return writeCode(doc);
     
 def writeCodeFromString(sbmlstring):
-    reader = SBMLReader();
+    reader = libsbml.SBMLReader();
     doc = reader.readSBMLFromString(sbmlstring);
     return writeCode(doc);
