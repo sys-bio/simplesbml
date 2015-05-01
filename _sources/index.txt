@@ -10,7 +10,9 @@ Welcome to the SimpleSBML documentation!
 ========================================
 
 This page describes the SimpleSBML package and its contents.  To install
-SimpleSBML, go to (source) and download the appropriate package.
+SimpleSBML, go to 
+https://github.com/sys-bio/simplesbml
+.
 
 To see the documentation for libSBML, go to 
 http://sbml.org/Software/libSBML/docs/python-api/index.html
