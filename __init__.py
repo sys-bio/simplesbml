@@ -106,6 +106,8 @@ class sbmlModel(object):
                     'assign reactant species')
             self.check(species_ref1.setConstant(True), \
                     'set "constant" on species ref 1')
+            self.check(species_ref1.setStoichiometry(1.), \
+                    'set "stoichiometry" on reactant')
             
         for pro in products:
             s2 = self.model.getSpecies(pro);
@@ -115,6 +117,8 @@ class sbmlModel(object):
                     'assign product species')
             self.check(species_ref2.setConstant(True), \
                     'set "constant" on species ref 2')
+            self.check(species_ref2.setStoichiometry(1.), \
+                    'set "stoichiometry" on product')
          
         math_ast = libsbml.parseL3Formula(expression);
         self.check(math_ast,    'create AST for rate expression')
