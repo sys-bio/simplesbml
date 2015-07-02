@@ -99,6 +99,8 @@ class sbmlModel(object):
         self.check(r1.setFast(False),          'set reaction "fast" attribute')
         
         for re in reactants:
+            if re is not None and '$' in re:
+                re.translate(None, '$')                
             s1 = self.model.getSpecies(re);
             species_ref1 = r1.createReactant()
             self.check(species_ref1,                       'create reactant')
@@ -110,6 +112,8 @@ class sbmlModel(object):
                     'set "stoichiometry" on reactant')
             
         for pro in products:
+            if pro is not None and '$' in pro:
+                pro.translate(None, '$')
             s2 = self.model.getSpecies(pro);
             species_ref2 = r1.createProduct()
             self.check(species_ref2, 'create product')
