@@ -7,6 +7,8 @@ Created on Tue Jan 27 23:13:42 2015
 
 import sys
 import libsbml
+from math import isnan
+from re import sub
 
 class sbmlModel(object):
             
@@ -26,16 +28,17 @@ class sbmlModel(object):
             return
     
     def __init__(self, time_units='second', extent_units='mole', \
-                 sub_units='mole'):
+                 sub_units='mole', level=3, version=1):
         try:
-            self.document = libsbml.SBMLDocument(3,1)
+            self.document = libsbml.SBMLDocument(level,version)
         except ValueError:
             raise SystemExit('Could not create SBMLDocument object')
         self.model = self.document.createModel()
         self.check(self.model, 'create model')
-        self.check(self.model.setTimeUnits('second'), 'set model-wide time units')
-        self.check(self.model.setExtentUnits('mole'), 'set model units of extent')
-        self.check(self.model.setSubstanceUnits('mole'),'set model substance units')
+        if self.document.getLevel() == 3:
+            self.check(self.model.setTimeUnits('second'), 'set model-wide time units')
+            self.check(self.model.setExtentUnits('mole'), 'set model units of extent')
+            self.check(self.model.setSubstanceUnits('mole'),'set model substance units')
         
         per_second = self.model.createUnitDefinition()
         self.check(per_second,                         'create unit definition')
@@ -64,7 +67,11 @@ class sbmlModel(object):
         s1 = self.model.createSpecies()
         self.check(s1,                           'create species s1')
         self.check(s1.setCompartment(comp),      'set species s1 compartment')
-        self.check(s1.setInitialAmount(amt),     'set initial amount for s1')
+        if species_id[0] == '[' and species_id[len(species_id)-1] == ']':
+        	self.check(s1.setInitialConcentration(amt),    'set initial concentration for s1')
+        	species_id = species_id[1:(len(species_id)-1)]
+        else:
+        	self.check(s1.setInitialAmount(amt),     'set initial amount for s1')
         self.check(s1.setSubstanceUnits('mole'), 'set substance units for s1')
         if species_id[0] == '$':
             self.check(s1.setBoundaryCondition(True), \
@@ -100,29 +107,51 @@ class sbmlModel(object):
         
         for re in reactants:
             if re is not None and '$' in re:
-                re.translate(None, '$')                
-            s1 = self.model.getSpecies(re);
+                re.translate(None, '$') 
+            re_split = re.split();
+            if len(re_split) == 1:
+                sto = 1.0;
+                re_id = re;
+            elif len(re_split) == 2 and re_split[0].isdigit():
+                sto = float(re_split[0]);
+                re_id = re_split[1];
+            else:
+                err_msg = 'Error: reactants must be listed in format \'S\' or \'(float)\' S\'';
+                raise SystemExit(err_msg)
+            s1 = self.model.getSpecies(re_id);
             species_ref1 = r1.createReactant()
             self.check(species_ref1,                       'create reactant')
             self.check(species_ref1.setSpecies(str(s1)[9:len(str(s1))-1]), \
                     'assign reactant species')
-            self.check(species_ref1.setConstant(True), \
+            self.check(species_ref1.setStoichiometry(sto), \
+            		'assign reactant stoichiometry')
+            if self.document.getLevel() == 3:
+                self.check(species_ref1.setConstant(True), \
                     'set "constant" on species ref 1')
-            self.check(species_ref1.setStoichiometry(1.), \
-                    'set "stoichiometry" on reactant')
             
         for pro in products:
             if pro is not None and '$' in pro:
                 pro.translate(None, '$')
-            s2 = self.model.getSpecies(pro);
+            pro_split = pro.split();
+            if len(pro_split) == 1:
+                sto = 1.0;
+                pro_id = pro;
+            elif len(pro_split) == 2:
+                sto = float(pro_split[0]);
+                pro_id = pro_split[1];
+            else:
+                err_msg = 'Error: products must be listed in format \'S\' or \'(float)\' S\'';
+                raise SystemExit(err_msg)
+            s2 = self.model.getSpecies(pro_id);
             species_ref2 = r1.createProduct()
             self.check(species_ref2, 'create product')
             self.check(species_ref2.setSpecies(str(s2)[9:len(str(s2))-1]), \
                     'assign product species')
-            self.check(species_ref2.setConstant(True), \
+            self.check(species_ref2.setStoichiometry(sto), \
+            		'set product stoichiometry')
+            if self.document.getLevel() == 3:
+                self.check(species_ref2.setConstant(True), \
                     'set "constant" on species ref 2')
-            self.check(species_ref2.setStoichiometry(1.), \
-                    'set "stoichiometry" on product')
          
         math_ast = libsbml.parseL3Formula(expression);
         self.check(math_ast,    'create AST for rate expression')
@@ -130,16 +159,17 @@ class sbmlModel(object):
         kinetic_law = r1.createKineticLaw()
         self.check(kinetic_law,                   'create kinetic law')
         self.check(kinetic_law.setMath(math_ast), 'set math on kinetic law')
-        for param in local_params.keys():
-            val = local_params.get(param);
-            p = kinetic_law.createLocalParameter()
-            self.check(p, 'create local parameter')
-            self.check(p.setId(param), 'set id of local parameter')
-            self.check(p.setValue(val),   'set value of local parameter')
+        if self.document.getLevel() == 3:
+            for param in local_params.keys():
+                val = local_params.get(param);
+                p = kinetic_law.createLocalParameter()
+                self.check(p, 'create local parameter')
+                self.check(p.setId(param), 'set id of local parameter')
+                self.check(p.setValue(val),   'set value of local parameter')
         return r1
     
-    def addEvent(self, trigger, delay, assignments, persistent=True, \
-                 initial_value=False, priority=0, event_id=''):
+    def addEvent(self, trigger, assignments, persistent=True, \
+                 initial_value=False, priority=0, delay=0, event_id=''):
         e1 = self.model.createEvent();
         self.check(e1,     'create event');
         if len(event_id) == 0:
@@ -148,13 +178,17 @@ class sbmlModel(object):
         
         tri = e1.createTrigger();
         self.check(tri,  'add trigger to event');
-        self.check(tri.setPersistent(persistent),   'set persistence of trigger');
-        self.check(tri.setInitialValue(initial_value), 'set initial value of trigger');
         tri_ast = libsbml.parseL3Formula(trigger);
         self.check(tri.setMath(tri_ast),     'add formula to trigger');
+        if self.document.getLevel() == 3:
+            self.check(tri.setPersistent(persistent),   'set persistence of trigger');
+            self.check(tri.setInitialValue(initial_value), 'set initial value of trigger');
         
         de = e1.createDelay();
-        k = self.addParameter(event_id+'Delay', delay, self.model.getTimeUnits());
+        if self.document.getLevel() == 3:
+            k = self.addParameter(event_id+'Delay', delay, self.model.getTimeUnits());
+        else:
+            k = self.addParameter(event_id+'Delay', delay, 'time');
         self.check(de,               'add delay to event');
         delay_ast = libsbml.parseL3Formula(k.getId());
         self.check(de.setMath(delay_ast),     'set formula for delay');
@@ -166,9 +200,10 @@ class sbmlModel(object):
             val_ast = libsbml.parseL3Formula(assignments.get(a));
             self.check(assign.setMath(val_ast),    'add value to event assignment');
         
-        pri = e1.createPriority();
-        pri_ast = libsbml.parseL3Formula(str(priority));
-        self.check(pri.setMath(pri_ast), 'add priority to event');
+        if self.document.getLevel() == 3:
+            pri = e1.createPriority();
+            pri_ast = libsbml.parseL3Formula(str(priority));
+            self.check(pri.setMath(pri_ast), 'add priority to event');
         return e1
     
     def addAssignmentRule(self, var, math):
@@ -188,6 +223,10 @@ class sbmlModel(object):
         return r
         
     def addInitialAssignment(self, symbol, math):
+        if self.document.getLevel() == 1 or (self.document.getLevel() == 2 \
+                and self.document.getVersion() == 1):
+            raise SystemExit('Error: InitialAssignment does not exist for \
+                    this level and version.')
         a = self.model.createInitialAssignment()
         self.check(a,   'create initial assignment a')
         self.check(a.setSymbol(symbol),    'set initial assignment a symbol')
@@ -241,22 +280,33 @@ class sbmlModel(object):
         return self.model.getInitialAssignment(var);
         
     def getListOfInitialAssignments(self):
-        return self.model.getListOfInitialAssignments();  
+        return self.model.getListOfInitialAssignments();
+
+    def toSBML(self):
+    	return libsbml.writeSBMLToString(self.document);
                   
     def __repr__(self):
-        return libsbml.writeSBMLToString(self.document)
+        return libsbml.writeSBMLToString(self.document);
         
 def writeCode(doc):
-    comp_template = 'model.addCompartment(\'%s\');';
-    species_template = 'model.addSpecies(\'%s\', %s);';
-    param_template = 'model.addParameter(\'%s\', %s);';
-    rxn_template = 'model.addReaction(%s, %s, \'%s\', %s, \'%s\');';
-    event_template = 'model.addEvent(\'%s\', %s, %s, %s, %s, %s, \'%s\');';
-    assignrule_template = 'model.addAssignmentRule(\'%s\', \'%s\');';
-    raterule_template = 'model.addRateRule(\'%s\', \'%s\');';
-    initassign_template = 'model.addInitialAssignment(\'%s\', \'%s\')';
-    init_template = 'import simplesbml\nmodel = simplesbml.sbmlModel(\'%s\', \'%s\', \'%s\');';
+    comp_template = 'model.addCompartment(comp_id=\'%s\');';
+    species_template = 'model.addSpecies(species_id=\'%s\', amt=%s, comp=\'%s\');';
+    param_template = 'model.addParameter(param_id=\'%s\', val=%s, units=\'%s\');';
+    rxn_template = 'model.addReaction(reactants=%s, products=%s, expression=\'%s\', local_params=%s, rxn_id=\'%s\');';
+    event_template = 'model.addEvent(trigger=\'%s\', assignments=%s, persistent=%s, initial_value=%s, priority=%s, delay=%s, event_id=\'%s\');';
+    event_defaults = [True, False, '0', 0];
+    assignrule_template = 'model.addAssignmentRule(var=\'%s\', math=\'%s\');';
+    raterule_template = 'model.addRateRule(var=\'%s\', math=\'%s\');';
+    initassign_template = 'model.addInitialAssignment(symbol=\'%s\', math=\'%s\')';
+    init_template = 'import simplesbml\nmodel = simplesbml.sbmlModel(time_units=\'%s\', extent_units=\'%s\', sub_units=\'%s\', level=%s, version=%s);';
+    init_defaults = ['second', 'mole', 'mole', 3, 1];
     command_list = [];
+
+    props = libsbml.ConversionProperties()
+    props.addOption('flatten comp', True)
+    result = doc.convert(props)
+    if(result != libsbml.LIBSBML_OPERATION_SUCCESS):
+        raise SystemExit('Conversion failed: (' + str(result) + ')');
     
     mod = doc.getModel();
     comps = mod.getListOfCompartments();
@@ -265,55 +315,96 @@ def writeCode(doc):
     rxns = mod.getListOfReactions();
     events = mod.getListOfEvents();
     rules = mod.getListOfRules();
-    inits = mod.getListOfInitialAssignments();
+    inits = [];
+    if doc.getLevel() == 3 or (doc.getLevel() == 2 and doc.getVersion() > 1):
+        inits = mod.getListOfInitialAssignments();
     
-    timeUnits = mod.getTimeUnits();
-    extentUnits = mod.getExtentUnits();
-    substanceUnits = mod.getSubstanceUnits();
-    command_list.append(init_template % (timeUnits, extentUnits, substanceUnits));
+    timeUnits = 'second';
+    substanceUnits = 'mole';
+    extentUnits = 'mole';
+    if doc.getLevel() == 3:    
+        timeUnits = mod.getTimeUnits();
+        extentUnits = mod.getExtentUnits();
+        substanceUnits = mod.getSubstanceUnits();
+    level = mod.getLevel();
+    version = mod.getVersion();
+    init_list = [timeUnits, extentUnits, substanceUnits, level, version];
+    for i in range(0,5):
+        if init_list[i] == init_defaults[i]:
+            init_list[i] = 'del';
+                   
+    command_list.append(init_template % \
+            (init_list[0], init_list[1], init_list[2], init_list[3], init_list[4]));
     
     for comp in comps:
         if comp.getId() != 'c1':
-            command_list.append(comp_template % (comp.getId()));
+            if comp.getId()[0] == 'c' and comp.getId()[1:len(comp.getId())].isdigit():
+                command_list.append(comp_template % ('del'));
+            else:
+                command_list.append(comp_template % (comp.getId()));
             
     for s in species:
-        amt = s.getInitialAmount();
+        conc = s.getInitialConcentration();
         sid = s.getId();
+        if s.getCompartment() == 'c1':
+            comp = 'del';
+        else:
+            comp = s.getCompartment();
         bc = s.getBoundaryCondition();
         if bc:
             sid = "$" + sid;
-        command_list.append(species_template % (sid, str(amt)));
+        if isnan(conc):
+            amt = s.getInitialAmount();
+            command_list.append(species_template % (sid, str(amt), comp));
+        else:
+            command_list.append(species_template % ("[" + sid + "]", str(conc), comp));
         
     for p in params:
         val = p.getValue();
         pid = p.getId();
+        if p.getUnits() == 'per_second':
+            units = 'del';
+        else:
+            units = p.getUnits();
         isDelay = pid.find('Delay');
         if isDelay == -1:
-            command_list.append(param_template % (pid, str(val)));
+            command_list.append(param_template % (pid, str(val), str(units)));
         
     for v in rxns:
         vid = v.getId();
+        if vid[0] == 'v' and vid[1:len(vid)].isdigit():
+            vid = 'del';
         reactants = [];
         for r in v.getListOfReactants():
-            reactants.append(r.getSpecies());
+            reactants.append((str(r.getStoichiometry()) + ' ' + r.getSpecies()).replace('1.0 ', ''));
         products = [];
         for p in v.getListOfProducts():
-            products.append(p.getSpecies());
+            products.append((str(p.getStoichiometry()) + ' ' + p.getSpecies()).replace('1.0 ', ''));
         expr = libsbml.formulaToString(v.getKineticLaw().getMath());
-        local_ids = [];
-        local_values = [];
-        for k in v.getKineticLaw().getListOfLocalParameters():
-            local_ids.append(k.getId());
-            local_values.append(k.getValue());
-        local_params = dict(zip(local_ids, local_values));
+        local_params = {};
+        if doc.getLevel() == 3:
+            local_ids = [];
+            local_values = [];
+            for k in v.getKineticLaw().getListOfLocalParameters():
+                local_ids.append(k.getId());
+                local_values.append(k.getValue());
+            local_params = dict(zip(local_ids, local_values));
+        if len(local_params) == 0:
+            local_params = 'del';
         command_list.append(rxn_template % (str(reactants), str(products), \
                     expr, str(local_params), vid));
         
     for e in events:
-        persistent = e.getTrigger().getPersistent();
-        initialValue = e.getTrigger().getInitialValue();
+        persistent = True;
+        initialValue = False;
+        priority = '0';
         eid = e.getId();
-        priority = libsbml.formulaToL3String(e.getPriority().getMath());
+        if eid[0] == 'e' and eid[1:len(eid)].isdigit():
+            eid = 'del';
+        if doc.getLevel() == 3:
+            persistent = e.getTrigger().getPersistent();
+            initialValue = e.getTrigger().getInitialValue();
+            priority = libsbml.formulaToL3String(e.getPriority().getMath());
         tri = libsbml.formulaToL3String(e.getTrigger().getMath());
         did = libsbml.formulaToL3String(e.getDelay().getMath());
         delay = mod.getParameter(did).getValue();
@@ -324,8 +415,14 @@ def writeCode(doc):
             var.append(assign.getVariable());
             values.append(libsbml.formulaToL3String(assign.getMath()));
         assigns = dict(zip(var, values));
-        command_list.append(event_template % (tri, str(delay), str(assigns), \
-                str(persistent), str(initialValue), str(priority), eid));
+        
+        event_list = [persistent, initialValue, priority, delay];
+        for i in range(0,4):
+            if event_list[i] == event_defaults[i]:
+                event_list[i] = 'del';
+            
+        command_list.append(event_template % (tri, str(assigns), \
+                event_list[0], event_list[1], event_list[2], event_list[3], eid));
     
     for r in rules:
         sym = r.getVariable();
@@ -343,11 +440,17 @@ def writeCode(doc):
         command_list.append(initassign_template % (sym, math));
     
     commands = '\n'.join(command_list);
+    commands = sub('\w+=\'?del\'?(?=[,)])', '', commands);
+    commands = sub('\((, )+', '(', commands);
+    commands = sub('(, )+\)', ')', commands);
+    commands = sub('(, )+', ', ', commands);
     return commands;
     
 def writeCodeFromFile(filename):
     reader = libsbml.SBMLReader();
     doc = reader.readSBMLFromFile(filename);
+    if doc.getNumErrors() > 0:
+        raise SystemExit(doc.getError(0));
     return writeCode(doc);
     
 def writeCodeFromString(sbmlstring):
