@@ -233,7 +233,26 @@ class sbmlModel(object):
         math_ast = libsbml.parseL3Formula(math);
         self.check(a.setMath(math_ast),    'set initial assignment a math')
         return a
-        
+            
+    def setLevelAndVersion(self, level, version):
+        if level == 1 and version == 2:
+            self.check(self.document.checkL1Compatibility(), 'convert to level 1 version 2');
+        elif level == 2 and version == 1:
+            self.check(self.document.checkL2v1Compatibility(), 'convert to level 2 version 1');
+        elif level == 2 and version == 2:
+            self.check(self.document.checkL2v2Compatibility(), 'convert to level 2 version 2');
+        elif level == 2 and version == 3:
+            self.check(self.document.checkL2v3Compatibility(), 'convert to level 2 version 3');
+        elif level == 2 and version == 4:
+            self.check(self.document.checkL2v4Compatibility(), 'convert to level 2 version 4');
+        elif level == 3 and version == 1:
+            self.check(self.document.checkL3v1Compatibility(), 'convert to level 3 version 1');
+        else:
+            raise SystemExit('Invalid level/version combination');
+            
+        isSet = self.document.setLevelAndVersion(level, version);
+        self.check(isSet, 'convert to level ' + str(level) + ' version ' + str(version));  
+                
     def getDocument(self):
         return self.document;
         
