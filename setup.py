@@ -8,7 +8,7 @@ Created on Thu Feb 12 16:19:07 2015
 from setuptools import setup
 
 setup(name='simplesbml',
-      version='0.1',
+      version='0.2',
       description='An interface for constructing SBML docs',
       author='Caroline Cannistra',
       author_email='carolc24@uw.edu',
