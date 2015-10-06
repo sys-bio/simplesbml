@@ -40,7 +40,7 @@ methods that can be used to build a libSBML version of the model.
 Classes and Methods
 -------------------
 
-.. class:: sbmlModel(self, time_units='second', extent_units='mole', sub_units='mole')
+.. class:: sbmlModel(self, time_units='second', extent_units='mole', sub_units='mole', level=3, version=1)
     
     sbmlModel is used to construct simple models using libSBML methods and 
     print out the model in SBML format.  A user can add species, parameters, 
@@ -55,10 +55,11 @@ Classes and Methods
     `Model <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html>`_
     attribute of *document*.
     
-    .. function:: addCompartment(self, comp_id='')
+    .. function:: addCompartment(self, vol=1e-15, comp_id='')
     
         Adds a `Compartment <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_compartment.html>`_ 
-        of volume 1 litre to the model.  If the user does
+        of volume *vol* litres to the model.  The default volume is 1e-15 litres, 
+        which is the volume of the average E.coli cell.  If the user does
         not specify *comp_id*, the id is set to 'c<n>' where the new compartment
         is the nth compartment added to the model. All sbmlModel objects are 
         initialized with a default compartment 'c1'.
@@ -67,8 +68,10 @@ Classes and Methods
     
         Adds a `Species <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_species.html>`_ 
         to the model.  If *species_id* starts
-        with the '$' symbol, the species is set as a boundary condition.  *amt* is
-        the initial amount of species within the specified compartment in moles.
+        with the '$' symbol, the species is set as a boundary condition.  If 
+        *species_id* is enclosed in brackets, the *amt* is the initial 
+        concentration of species within the specified compartment in mol/L.
+        Otherwise, *amt* is the initial amount of species in moles.
     
     .. function:: addParameter(self, param_id, val, units='per_second')
     
@@ -84,6 +87,9 @@ Classes and Methods
     
         *reactants* and *products* are lists of species
         ids that the user wishes to define as reactants and products, respectively.
+        If one of these lists contains a string with a number followed by a species
+        id (i.e. '2 G6P') then the number is interpreted as the stoichiometry of 
+        the species.  Otherwise it is assumed to be 1.
         
         *expression* is a string that represents the reaction rate expression. 
         
@@ -94,7 +100,7 @@ Classes and Methods
         user does not define a reaction id, it is set as 'v<n>' where the new
         reaction is the nth reaction added.
     
-    .. function:: addEvent(self, trigger, delay, assignments, persistent=True, initial_value=False, priority=0, event_id='')
+    .. function:: addEvent(self, trigger, assignments, persistent=True, initial_value=False, priority=0, delay=0, event_id='')
     
         Adds an `Event <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_event.html>`_ 
         to the model.  
