@@ -1,7 +1,7 @@
 Metadata-Version: 1.0
 Name: simplesbml
-Version: 0.1
-Summary: An interface for constructing SBML docs
+Version: 1.1
+Summary: A simplified interface for constructing SBML docs
 Home-page: UNKNOWN
 Author: Caroline Cannistra
 Author-email: carolc24@uw.edu

@@ -8,7 +8,7 @@ SBML documentation: http://sbml.org/Main_Page
 
 # How to install SimpleSBML
 
-You can download the package in a .zip and unzip the contents, or directly clone the directory.  In the command line, move into the 'simplesbml/' folder.  Type 'python setup.py install'.  After doing this, open the module in Python by typing 'import simplesbml' into the command line in Python.
+You can download the package in a .zip and unzip the contents, or directly clone the directory.  In the command line, move into the 'simplesbml/' folder.  This folder should also contain a file called 'setup.py'.  Type 'python setup.py install'.  After doing this, open the module in Python by typing 'import simplesbml' into the command line in Python.
 
 Dependencies: libSBML
 

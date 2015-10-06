@@ -5,7 +5,6 @@ Created on Tue Jan 27 23:13:42 2015
 @author: carolc24
 """
 
-import sys
 import libsbml
 from math import isnan
 from re import sub
@@ -36,9 +35,9 @@ class sbmlModel(object):
         self.model = self.document.createModel()
         self.check(self.model, 'create model')
         if self.document.getLevel() == 3:
-            self.check(self.model.setTimeUnits('second'), 'set model-wide time units')
-            self.check(self.model.setExtentUnits('mole'), 'set model units of extent')
-            self.check(self.model.setSubstanceUnits('mole'),'set model substance units')
+            self.check(self.model.setTimeUnits(time_units), 'set model-wide time units')
+            self.check(self.model.setExtentUnits(extent_units), 'set model units of extent')
+            self.check(self.model.setSubstanceUnits(sub_units),'set model substance units')
         
         per_second = self.model.createUnitDefinition()
         self.check(per_second,                         'create unit definition')
@@ -51,14 +50,14 @@ class sbmlModel(object):
         self.check(unit.setMultiplier(1),              'set unit multiplier')
         self.addCompartment();
             
-    def addCompartment(self, comp_id=''):
+    def addCompartment(self, vol=1e-15, comp_id=''):
         c1 = self.model.createCompartment()
         self.check(c1,                                 'create compartment')
         if len(comp_id) == 0:
             comp_id = 'c' + str(self.model.getNumCompartments());
         self.check(c1.setId(comp_id),                     'set compartment id')
         self.check(c1.setConstant(True),               'set compartment "constant"')
-        self.check(c1.setSize(1),                      'set compartment "size"')
+        self.check(c1.setSize(vol),                      'set compartment "size"')
         self.check(c1.setSpatialDimensions(3),         'set compartment dimensions')
         self.check(c1.setUnits('litre'),               'set compartment size units')
         return c1
@@ -72,7 +71,7 @@ class sbmlModel(object):
         	species_id = species_id[1:(len(species_id)-1)]
         else:
         	self.check(s1.setInitialAmount(amt),     'set initial amount for s1')
-        self.check(s1.setSubstanceUnits('mole'), 'set substance units for s1')
+        self.check(s1.setSubstanceUnits(self.model.getSubstanceUnits()), 'set substance units for s1')
         if species_id[0] == '$':
             self.check(s1.setBoundaryCondition(True), \
                     'set "boundaryCondition" on s1')
@@ -91,7 +90,7 @@ class sbmlModel(object):
         k = self.model.createParameter()
         self.check(k,                        'create parameter k')
         self.check(k.setId(param_id),        'set parameter k id')
-        self.check(k.setConstant(True),      'set parameter k "constant"')
+        self.check(k.setConstant(False),      'set parameter k "not constant"')
         self.check(k.setValue(val),          'set parameter k value')
         self.check(k.setUnits(units), 'set parameter k units')
         return k
@@ -175,6 +174,9 @@ class sbmlModel(object):
         if len(event_id) == 0:
             event_id = 'e' + str(self.model.getNumEvents());
         self.check(e1.setId(event_id),    'add id to event');
+        if self.document.getLevel()==3 or (self.document.getLevel()==2 \
+                    and self.document.getVersion()==4):
+            self.check(e1.setUseValuesFromTriggerTime(True), 'set use values from trigger time');
         
         tri = e1.createTrigger();
         self.check(tri,  'add trigger to event');
@@ -308,7 +310,7 @@ class sbmlModel(object):
         return libsbml.writeSBMLToString(self.document);
         
 def writeCode(doc):
-    comp_template = 'model.addCompartment(comp_id=\'%s\');';
+    comp_template = 'model.addCompartment(vol=%s, comp_id=\'%s\');';
     species_template = 'model.addSpecies(species_id=\'%s\', amt=%s, comp=\'%s\');';
     param_template = 'model.addParameter(param_id=\'%s\', val=%s, units=\'%s\');';
     rxn_template = 'model.addReaction(reactants=%s, products=%s, expression=\'%s\', local_params=%s, rxn_id=\'%s\');';
@@ -358,9 +360,15 @@ def writeCode(doc):
     for comp in comps:
         if comp.getId() != 'c1':
             if comp.getId()[0] == 'c' and comp.getId()[1:len(comp.getId())].isdigit():
-                command_list.append(comp_template % ('del'));
+                if comp.getSize() == 1e-15:
+                    command_list.append(comp_template % ('del', 'del'));
+                else:
+                    command_list.append(comp_template % (comp.getSize(), 'del'));
             else:
-                command_list.append(comp_template % (comp.getId()));
+                if comp.getSize() == 1e-15:
+                    command_list.append(comp_template % ('del', comp.getId()));
+                else:
+                    command_list.append(comp_template % (comp.getSize(), comp.getId()));
             
     for s in species:
         conc = s.getInitialConcentration();
