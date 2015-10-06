@@ -169,6 +169,10 @@ Classes and Methods
         `Model <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html>`_
         object of the sbmlModel.
 
+    .. function:: toSBML(self)
+
+       Returns the model in SBML format as a string.
+
 .. function:: writeCode(doc)
 
     Returns a string containing calls to SimpleSBML functions that reproduce
