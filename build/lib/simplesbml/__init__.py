@@ -28,6 +28,8 @@ class sbmlModel(object):
     
     def __init__(self, time_units='second', extent_units='mole', \
                  sub_units='mole', level=3, version=1):
+        if level == 1:
+            raise SystemExit('Error: SimpleSBML does not support SBML level 1')
         try:
             self.document = libsbml.SBMLDocument(level,version)
         except ValueError:
@@ -48,6 +50,7 @@ class sbmlModel(object):
         self.check(unit.setExponent(-1),               'set unit exponent')
         self.check(unit.setScale(0),                   'set unit scale')
         self.check(unit.setMultiplier(1),              'set unit multiplier')
+            
         self.addCompartment();
             
     def addCompartment(self, vol=1e-15, comp_id=''):
@@ -57,8 +60,9 @@ class sbmlModel(object):
             comp_id = 'c' + str(self.model.getNumCompartments());
         self.check(c1.setId(comp_id),                     'set compartment id')
         self.check(c1.setConstant(True),               'set compartment "constant"')
-        self.check(c1.setSize(vol),                      'set compartment "size"')
         self.check(c1.setSpatialDimensions(3),         'set compartment dimensions')
+            
+        self.check(c1.setSize(vol),                      'set compartment "size"')
         self.check(c1.setUnits('litre'),               'set compartment size units')
         return c1
         
@@ -67,8 +71,8 @@ class sbmlModel(object):
         self.check(s1,                           'create species s1')
         self.check(s1.setCompartment(comp),      'set species s1 compartment')
         if species_id[0] == '[' and species_id[len(species_id)-1] == ']':
-        	self.check(s1.setInitialConcentration(amt),    'set initial concentration for s1')
-        	species_id = species_id[1:(len(species_id)-1)]
+            self.check(s1.setInitialConcentration(amt),    'set initial concentration for s1')
+            species_id = species_id[1:(len(species_id)-1)]
         else:
         	self.check(s1.setInitialAmount(amt),     'set initial amount for s1')
         self.check(s1.setSubstanceUnits(self.model.getSubstanceUnits()), 'set substance units for s1')
@@ -158,13 +162,15 @@ class sbmlModel(object):
         kinetic_law = r1.createKineticLaw()
         self.check(kinetic_law,                   'create kinetic law')
         self.check(kinetic_law.setMath(math_ast), 'set math on kinetic law')
-        if self.document.getLevel() == 3:
-            for param in local_params.keys():
-                val = local_params.get(param);
+        for param in local_params.keys():
+            val = local_params.get(param);
+            if self.document.getLevel() == 3:
                 p = kinetic_law.createLocalParameter()
-                self.check(p, 'create local parameter')
-                self.check(p.setId(param), 'set id of local parameter')
-                self.check(p.setValue(val),   'set value of local parameter')
+            else:
+                p = kinetic_law.createParameter()
+            self.check(p, 'create local parameter')
+            self.check(p.setId(param), 'set id of local parameter')
+            self.check(p.setValue(val),   'set value of local parameter')
         return r1
     
     def addEvent(self, trigger, assignments, persistent=True, \
@@ -225,8 +231,7 @@ class sbmlModel(object):
         return r
         
     def addInitialAssignment(self, symbol, math):
-        if self.document.getLevel() == 1 or (self.document.getLevel() == 2 \
-                and self.document.getVersion() == 1):
+        if self.document.getLevel() == 2 and self.document.getVersion() == 1:
             raise SystemExit('Error: InitialAssignment does not exist for \
                     this level and version.')
         a = self.model.createInitialAssignment()
@@ -237,9 +242,7 @@ class sbmlModel(object):
         return a
             
     def setLevelAndVersion(self, level, version):
-        if level == 1 and version == 2:
-            self.check(self.document.checkL1Compatibility(), 'convert to level 1 version 2');
-        elif level == 2 and version == 1:
+        if level == 2 and version == 1:
             self.check(self.document.checkL2v1Compatibility(), 'convert to level 2 version 1');
         elif level == 2 and version == 2:
             self.check(self.document.checkL2v2Compatibility(), 'convert to level 2 version 2');
@@ -322,6 +325,10 @@ def writeCode(doc):
     init_template = 'import simplesbml\nmodel = simplesbml.sbmlModel(time_units=\'%s\', extent_units=\'%s\', sub_units=\'%s\', level=%s, version=%s);';
     init_defaults = ['second', 'mole', 'mole', 3, 1];
     command_list = [];
+    
+    if doc.getLevel() == 1:
+        print "Warning: SimpleSBML does not support Level 1 SBML models.  Before \
+        running this code, set the model to level 2 or 3."
 
     props = libsbml.ConversionProperties()
     props.addOption('flatten comp', True)
@@ -372,6 +379,7 @@ def writeCode(doc):
             
     for s in species:
         conc = s.getInitialConcentration();
+        amt = s.getInitialAmount();
         sid = s.getId();
         if s.getCompartment() == 'c1':
             comp = 'del';
@@ -380,8 +388,7 @@ def writeCode(doc):
         bc = s.getBoundaryCondition();
         if bc:
             sid = "$" + sid;
-        if isnan(conc):
-            amt = s.getInitialAmount();
+        if isnan(conc) or amt > conc:
             command_list.append(species_template % (sid, str(amt), comp));
         else:
             command_list.append(species_template % ("[" + sid + "]", str(conc), comp));
@@ -409,13 +416,12 @@ def writeCode(doc):
             products.append((str(p.getStoichiometry()) + ' ' + p.getSpecies()).replace('1.0 ', ''));
         expr = libsbml.formulaToString(v.getKineticLaw().getMath());
         local_params = {};
-        if doc.getLevel() == 3:
-            local_ids = [];
-            local_values = [];
-            for k in v.getKineticLaw().getListOfLocalParameters():
-                local_ids.append(k.getId());
-                local_values.append(k.getValue());
-            local_params = dict(zip(local_ids, local_values));
+        local_ids = [];
+        local_values = [];
+        for k in v.getKineticLaw().getListOfParameters():
+            local_ids.append(k.getId());
+            local_values.append(k.getValue());
+        local_params = dict(zip(local_ids, local_values));
         if len(local_params) == 0:
             local_params = 'del';
         command_list.append(rxn_template % (str(reactants), str(products), \
