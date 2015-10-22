@@ -194,52 +194,46 @@ Classes and Methods
 Examples
 --------
 
-Here is an example of a simple reaction-based model built with sbmlModel.
+Here is an example of a simple reaction-based model built with sbmlModel.::
 
-``
-import simplesbml
-model = simplesbml.sbmlModel();
-model.addCompartment(1e-14, comp_id='comp');
-model.addSpecies('E', 5e-21, comp='comp');
-model.addSpecies('S', 1e-20, comp='comp');
-model.addSpecies('P', 0.0, comp='comp');
-model.addSpecies('ES', 0.0, comp='comp');
-model.addReaction(['E', 'S'], ['ES'], 'comp*(kon*E*S-koff*ES)', local_params={'koff': 0.2, 'kon': 1000000.0}, rxn_id='veq');
-model.addReaction(['ES'], ['E', 'P'], 'comp*kcat*ES', local_params={'kcat': 0.1}, rxn_id='vcat');
-``
+    import simplesbml
+    model = simplesbml.sbmlModel();
+    model.addCompartment(1e-14, comp_id='comp');
+    model.addSpecies('E', 5e-21, comp='comp');
+    model.addSpecies('S', 1e-20, comp='comp');
+    model.addSpecies('P', 0.0, comp='comp');
+    model.addSpecies('ES', 0.0, comp='comp');
+    model.addReaction(['E', 'S'], ['ES'], 'comp*(kon*E*S-koff*ES)', local_params={'koff': 0.2, 'kon': 1000000.0}, rxn_id='veq');
+    model.addReaction(['ES'], ['E', 'P'], 'comp*kcat*ES', local_params={'kcat': 0.1}, rxn_id='vcat');
 
-In this example, reaction rate constants are stored locally with the reactions where they are used.  It is also possible to define global parameters and use them in reaction expressions.  Here is an example of this usage.
+In this example, reaction rate constants are stored locally with the reactions where they are used.  It is also possible to define global parameters and use them in reaction expressions.  Here is an example of this usage.::
 
-``
-import simplesbml
-model = simplesbml.sbmlModel();
-model.addCompartment(1e-14, comp_id='comp');
-model.addSpecies('E', 5e-21, comp='comp');
-model.addSpecies('S', 1e-20, comp='comp');
-model.addSpecies('P', 0.0, comp='comp');
-model.addSpecies('ES', 0.0, comp='comp');
-model.addParameter('koff', 0.2);
-model.addParameter('kon', 1000000.0);
-model.addParameter('kcat', 0.1);
-model.addReaction(['E', 'S'], ['ES'], 'comp*(kon*E*S-koff*ES)', rxn_id='veq');
-model.addReaction(['ES'], ['E', 'P'], 'comp*kcat*ES', rxn_id='vcat');
-``
+    import simplesbml
+    model = simplesbml.sbmlModel();
+    model.addCompartment(1e-14, comp_id='comp');
+    model.addSpecies('E', 5e-21, comp='comp');
+    model.addSpecies('S', 1e-20, comp='comp');
+    model.addSpecies('P', 0.0, comp='comp');
+    model.addSpecies('ES', 0.0, comp='comp');
+    model.addParameter('koff', 0.2);
+    model.addParameter('kon', 1000000.0);
+    model.addParameter('kcat', 0.1);
+    model.addReaction(['E', 'S'], ['ES'], 'comp*(kon*E*S-koff*ES)', rxn_id='veq');
+    model.addReaction(['ES'], ['E', 'P'], 'comp*kcat*ES', rxn_id='vcat');
 
-sbmlModel also supports the use of events to change the system state under certain conditions, and the use of assignment rules and rate rules to explicitly define variable values as a function of the system state.  Here is an example of events and rate rules. In this example, the value of parameter G2 is instantaneously determined by the relationship between P1 and tau, and the rates of change of P1 and P2 are explicitly defined in equation form instead of with a reaction.
+sbmlModel also supports the use of events to change the system state under certain conditions, and the use of assignment rules and rate rules to explicitly define variable values as a function of the system state.  Here is an example of events and rate rules. In this example, the value of parameter G2 is instantaneously determined by the relationship between P1 and tau, and the rates of change of P1 and P2 are explicitly defined in equation form instead of with a reaction.::
 
-``
-import simplesbml
-model = simplesbml.sbmlModel();
-model.addCompartment(vol=1.0, comp_id='cell');
-model.addSpecies('[P1]', 0.0, comp='cell');
-model.addSpecies('[P2]', 0.0, comp='cell');
-model.addParameter('k1', 1.0);
-model.addParameter('k2', 1.0);
-model.addParameter('tau', 0.25, units='concentration');
-model.addParameter('G1', 1.0, units='concentration');
-model.addParameter('G2', 0.0, units='concentration');
-model.addEvent(trigger='P1 > tau', assignments={'G2': '1 concentration'});
-model.addEvent(trigger='P1 <= tau', assignments={'G2': '0 concentration'});
-model.addRateRule('P1', 'k1 * (G1 - P1)');
-model.addRateRule('P2', 'k2 * (G2 - P2)');
-``
+    import simplesbml
+    model = simplesbml.sbmlModel();
+    model.addCompartment(vol=1.0, comp_id='cell');
+    model.addSpecies('[P1]', 0.0, comp='cell');
+    model.addSpecies('[P2]', 0.0, comp='cell');
+    model.addParameter('k1', 1.0);
+    model.addParameter('k2', 1.0);
+    model.addParameter('tau', 0.25, units='concentration');
+    model.addParameter('G1', 1.0, units='concentration');
+    model.addParameter('G2', 0.0, units='concentration');
+    model.addEvent(trigger='P1 > tau', assignments={'G2': '1 concentration'});
+    model.addEvent(trigger='P1 <= tau', assignments={'G2': '0 concentration'});
+    model.addRateRule('P1', 'k1 * (G1 - P1)');
+    model.addRateRule('P2', 'k2 * (G2 - P2)');
