@@ -432,15 +432,22 @@ def writeCode(doc):
         initialValue = False;
         priority = '0';
         eid = e.getId();
-        if eid[0] == 'e' and eid[1:len(eid)].isdigit():
+        if len(eid) == 0 or (eid[0] == 'e' and eid[1:len(eid)].isdigit()):
             eid = 'del';
         if doc.getLevel() == 3:
             persistent = e.getTrigger().getPersistent();
             initialValue = e.getTrigger().getInitialValue();
-            priority = libsbml.formulaToL3String(e.getPriority().getMath());
+            priority = e.getPriority();
+            if type(priority) == libsbml.Priority:
+                priority = libsbml.formulaToL3String(priority.getMath());
+            else:
+                priority = '0';
         tri = libsbml.formulaToL3String(e.getTrigger().getMath());
-        did = libsbml.formulaToL3String(e.getDelay().getMath());
-        delay = mod.getParameter(did).getValue();
+        did = e.getDelay();
+        if type(did) == libsbml.Delay:
+            delay = libsbml.formulaToL3String(did.getMath());
+        else:
+            delay = '0';
         assigns = e.getListOfEventAssignments();
         var = [];
         values = [];
