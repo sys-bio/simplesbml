@@ -242,6 +242,53 @@ the model in an sbmlModel object.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example of a simple reaction-based model built with sbmlModel.</p>
+<p>``
+import simplesbml
+model = simplesbml.sbmlModel();
+model.addCompartment(1e-14, comp_id=&#8217;comp&#8217;);
+model.addSpecies(&#8216;E&#8217;, 5e-21, comp=&#8217;comp&#8217;);
+model.addSpecies(&#8216;S&#8217;, 1e-20, comp=&#8217;comp&#8217;);
+model.addSpecies(&#8216;P&#8217;, 0.0, comp=&#8217;comp&#8217;);
+model.addSpecies(&#8216;ES&#8217;, 0.0, comp=&#8217;comp&#8217;);
+model.addReaction([&#8216;E&#8217;, &#8216;S&#8217;], [&#8216;ES&#8217;], &#8216;comp*(kon*E*S-koff*ES)&#8217;, local_params={&#8216;koff&#8217;: 0.2, &#8216;kon&#8217;: 1000000.0}, rxn_id=&#8217;veq&#8217;);
+model.addReaction([&#8216;ES&#8217;], [&#8216;E&#8217;, &#8216;P&#8217;], &#8216;comp*kcat*ES&#8217;, local_params={&#8216;kcat&#8217;: 0.1}, rxn_id=&#8217;vcat&#8217;);
+``</p>
+<p>In this example, reaction rate constants are stored locally with the reactions where they are used.  It is also possible to define global parameters and use them in reaction expressions.  Here is an example of this usage.</p>
+<p>``
+import simplesbml
+model = simplesbml.sbmlModel();
+model.addCompartment(1e-14, comp_id=&#8217;comp&#8217;);
+model.addSpecies(&#8216;E&#8217;, 5e-21, comp=&#8217;comp&#8217;);
+model.addSpecies(&#8216;S&#8217;, 1e-20, comp=&#8217;comp&#8217;);
+model.addSpecies(&#8216;P&#8217;, 0.0, comp=&#8217;comp&#8217;);
+model.addSpecies(&#8216;ES&#8217;, 0.0, comp=&#8217;comp&#8217;);
+model.addParameter(&#8216;koff&#8217;, 0.2);
+model.addParameter(&#8216;kon&#8217;, 1000000.0);
+model.addParameter(&#8216;kcat&#8217;, 0.1);
+model.addReaction([&#8216;E&#8217;, &#8216;S&#8217;], [&#8216;ES&#8217;], &#8216;comp*(kon*E*S-koff*ES)&#8217;, rxn_id=&#8217;veq&#8217;);
+model.addReaction([&#8216;ES&#8217;], [&#8216;E&#8217;, &#8216;P&#8217;], &#8216;comp*kcat*ES&#8217;, rxn_id=&#8217;vcat&#8217;);
+``</p>
+<p>sbmlModel also supports the use of events to change the system state under certain conditions, and the use of assignment rules and rate rules to explicitly define variable values as a function of the system state.  Here is an example of events and rate rules. In this example, the value of parameter G2 is instantaneously determined by the relationship between P1 and tau, and the rates of change of P1 and P2 are explicitly defined in equation form instead of with a reaction.</p>
+<p>``
+import simplesbml
+model = simplesbml.sbmlModel();
+model.addCompartment(vol=1.0, comp_id=&#8217;cell&#8217;);
+model.addSpecies(&#8216;[P1]&#8217;, 0.0, comp=&#8217;cell&#8217;);
+model.addSpecies(&#8216;[P2]&#8217;, 0.0, comp=&#8217;cell&#8217;);
+model.addParameter(&#8216;k1&#8217;, 1.0);
+model.addParameter(&#8216;k2&#8217;, 1.0);
+model.addParameter(&#8216;tau&#8217;, 0.25, units=&#8217;concentration&#8217;);
+model.addParameter(&#8216;G1&#8217;, 1.0, units=&#8217;concentration&#8217;);
+model.addParameter(&#8216;G2&#8217;, 0.0, units=&#8217;concentration&#8217;);
+model.addEvent(trigger=&#8217;P1 &gt; tau&#8217;, assignments={&#8216;G2&#8217;: &#8216;1 concentration&#8217;});
+model.addEvent(trigger=&#8217;P1 &lt;= tau&#8217;, assignments={&#8216;G2&#8217;: &#8216;0 concentration&#8217;});
+model.addRateRule(&#8216;P1&#8217;, &#8216;k1 * (G1 - P1)&#8217;);
+model.addRateRule(&#8216;P2&#8217;, &#8216;k2 * (G2 - P2)&#8217;);
+``</p>
+</div>
 </div>
 
 
@@ -255,6 +302,7 @@ the model in an sbmlModel object.</p>
 <li><a class="reference internal" href="#">Welcome to the SimpleSBML documentation!</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#classes-and-methods">Classes and Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
 </ul>
