@@ -194,6 +194,8 @@ Classes and Methods
 Examples
 --------
 
+Example models are taken from the SBML Level 3 Version 1 documentation.
+
 Here is an example of a simple reaction-based model built with sbmlModel::
 
     import simplesbml
