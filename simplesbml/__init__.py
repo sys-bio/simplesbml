@@ -53,7 +53,7 @@ class sbmlModel(object):
             
         self.addCompartment();
             
-    def addCompartment(self, vol=1e-15, comp_id=''):
+    def addCompartment(self, vol=1, comp_id=''):
         c1 = self.model.createCompartment()
         self.check(c1,                                 'create compartment')
         if len(comp_id) == 0:
@@ -307,10 +307,15 @@ class sbmlModel(object):
         return self.model.getListOfInitialAssignments();
 
     def toSBML(self):
-    	return libsbml.writeSBMLToString(self.document);
+        errors = self.document.checkConsistency();
+        if (errors > 0):
+            for i in range(errors):
+                print self.document.getError(i).getSeverityAsString(), ": ", self.document.getError(i).getMessage();
+              
+        return libsbml.writeSBMLToString(self.document);
                   
     def __repr__(self):
-        return libsbml.writeSBMLToString(self.document);
+        return self.toSBML();
         
 def writeCode(doc):
     comp_template = 'model.addCompartment(vol=%s, comp_id=\'%s\');';
