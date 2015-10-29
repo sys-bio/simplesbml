@@ -86,10 +86,9 @@ object, and
 attribute of <em>document</em>.</p>
 <dl class="function">
 <dt id="simplesbml.sbmlModel.addCompartment">
-<code class="descname">addCompartment</code><span class="sig-paren">(</span><em>self</em>, <em>vol=1e-15</em>, <em>comp_id=''</em><span class="sig-paren">)</span><a class="headerlink" href="#simplesbml.sbmlModel.addCompartment" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addCompartment</code><span class="sig-paren">(</span><em>self</em>, <em>vol=1</em>, <em>comp_id=''</em><span class="sig-paren">)</span><a class="headerlink" href="#simplesbml.sbmlModel.addCompartment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a <a class="reference external" href="http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_compartment.html">Compartment</a>
-of volume <em>vol</em> litres to the model.  The default volume is 1e-15 litres,
-which is the volume of the average E.coli cell.  If the user does
+of volume <em>vol</em> litres to the model.  The default volume is 1 litre. If the user does
 not specify <em>comp_id</em>, the id is set to &#8216;c&lt;n&gt;&#8217; where the new compartment
 is the nth compartment added to the model. All sbmlModel objects are
 initialized with a default compartment &#8216;c1&#8217;.</p>
@@ -213,7 +212,8 @@ object of the sbmlModel.</p>
 <dl class="function">
 <dt id="simplesbml.sbmlModel.toSBML">
 <code class="descname">toSBML</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#simplesbml.sbmlModel.toSBML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the model in SBML format as a string.</p>
+<dd><p>Returns the model in SBML format as a string.  Also checks model consistency
+and prints all errors and warnings.</p>
 </dd></dl>
 
 </dd></dl>

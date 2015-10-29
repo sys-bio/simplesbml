@@ -55,11 +55,10 @@ Classes and Methods
     `Model <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html>`_
     attribute of *document*.
     
-    .. function:: addCompartment(self, vol=1e-15, comp_id='')
+    .. function:: addCompartment(self, vol=1, comp_id='')
     
         Adds a `Compartment <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_compartment.html>`_ 
-        of volume *vol* litres to the model.  The default volume is 1e-15 litres, 
-        which is the volume of the average E.coli cell.  If the user does
+        of volume *vol* litres to the model.  The default volume is 1 litre. If the user does
         not specify *comp_id*, the id is set to 'c<n>' where the new compartment
         is the nth compartment added to the model. All sbmlModel objects are 
         initialized with a default compartment 'c1'.
@@ -171,7 +170,8 @@ Classes and Methods
 
     .. function:: toSBML(self)
 
-       Returns the model in SBML format as a string.
+       Returns the model in SBML format as a string.  Also checks model consistency 
+       and prints all errors and warnings.  
 
 .. function:: writeCode(doc)
 
