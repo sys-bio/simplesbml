@@ -7,6 +7,7 @@ Created on Tue Jan 27 23:13:42 2015
 
 import libsbml
 from math import isnan
+import re
 from re import sub
 
 class sbmlModel(object):
@@ -100,6 +101,7 @@ class sbmlModel(object):
         return k
         
     def addReaction(self, reactants, products, expression, local_params={}, rxn_id=''):
+        reSpecies = r'(\[?)(\w*)(\]?)*'
         r1 = self.model.createReaction()
         self.check(r1,                         'create reaction')
         if len(rxn_id) == 0:
@@ -108,60 +110,73 @@ class sbmlModel(object):
         self.check(r1.setReversible(False),    'set reaction reversibility flag')
         self.check(r1.setFast(False),          'set reaction "fast" attribute')
         
-        for re in reactants:
-            if re is not None and '$' in re:
-                re.translate(None, '$') 
-            re_split = re.split();
-            if len(re_split) == 1:
-                sto = 1.0;
-                re_id = re;
-            elif len(re_split) == 2 and re_split[0].isdigit():
-                sto = float(re_split[0]);
-                re_id = re_split[1];
-            else:
-                err_msg = 'Error: reactants must be listed in format \'S\' or \'(float)\' S\'';
-                raise SystemExit(err_msg)
-            s1 = self.model.getSpecies(re_id);
-            species_ref1 = r1.createReactant()
-            self.check(species_ref1,                       'create reactant')
-            self.check(species_ref1.setSpecies(str(s1)[9:len(str(s1))-1]), \
-                    'assign reactant species')
-            self.check(species_ref1.setStoichiometry(sto), \
-            		'assign reactant stoichiometry')
-            if self.document.getLevel() == 3:
-                self.check(species_ref1.setConstant(True), \
-                    'set "constant" on species ref 1')
-            
-        for pro in products:
-            if pro is not None and '$' in pro:
-                pro.translate(None, '$')
-            pro_split = pro.split();
-            if len(pro_split) == 1:
-                sto = 1.0;
-                pro_id = pro;
-            elif len(pro_split) == 2:
-                sto = float(pro_split[0]);
-                pro_id = pro_split[1];
-            else:
-                err_msg = 'Error: products must be listed in format \'S\' or \'(float)\' S\'';
-                raise SystemExit(err_msg)
-            s2 = self.model.getSpecies(pro_id);
-            species_ref2 = r1.createProduct()
-            self.check(species_ref2, 'create product')
-            self.check(species_ref2.setSpecies(str(s2)[9:len(str(s2))-1]), \
-                    'assign product species')
-            self.check(species_ref2.setStoichiometry(sto), \
-            		'set product stoichiometry')
-            if self.document.getLevel() == 3:
-                self.check(species_ref2.setConstant(True), \
-                    'set "constant" on species ref 2')
-         
         math_ast = libsbml.parseL3Formula(expression);
         self.check(math_ast,    'create AST for rate expression')
      
         kinetic_law = r1.createKineticLaw()
         self.check(kinetic_law,                   'create kinetic law')
         self.check(kinetic_law.setMath(math_ast), 'set math on kinetic law')
+        
+        reactant = re.split(reSpecies, reactants)
+        if reactants is not None and '$' in reactants:
+            reactants.translate(None, '$') 
+        if reactant[2] in expression:
+#        for re in reactants:
+#            if re is not None and '$' in re:
+#                re.translate(None, '$') 
+#            re_split = re.split();
+#            if len(re_split) == 1:
+#                sto = 1.0;
+#                re_id = re;
+#            elif len(re_split) == 2 and re_split[0].isdigit():
+#                sto = float(re_split[0]);
+#                re_id = re_split[1];
+#            else:
+#                err_msg = 'Error: reactants must be listed in format \'S\' or \'(float)\' S\'';
+#                raise SystemExit(err_msg)
+            re_id = reactant[2]
+            s1 = self.model.getSpecies(re_id);
+            species_ref1 = r1.createReactant()
+            self.check(species_ref1,                       'create reactant')
+            self.check(species_ref1.setSpecies(str(s1)[9:len(str(s1))-1]), \
+                    'assign reactant species')
+            self.check(species_ref1.setStoichiometry(int(len(reactant)/5)), \
+            		'assign reactant stoichiometry')
+            if self.document.getLevel() == 3:
+                self.check(species_ref1.setConstant(True), \
+                    'set "constant" on species ref 1')
+        
+        product = re.split(reSpecies, products)
+        if products is not None and '$' in products:
+            products.translate(None, '$') 
+        if product[2] in expression:
+            r1.setReversible(True)
+            
+#        for pro in products:
+#            if pro is not None and '$' in pro:
+#                pro.translate(None, '$')
+#            pro_split = pro.split();
+#            if len(pro_split) == 1:
+#                sto = 1.0;
+#                pro_id = pro;
+#            elif len(pro_split) == 2:
+#                sto = float(pro_split[0]);
+#                pro_id = pro_split[1];
+#            else:
+#                err_msg = 'Error: products must be listed in format \'S\' or \'(float)\' S\'';
+#                raise SystemExit(err_msg)
+        pro_id = product[2]
+        s2 = self.model.getSpecies(pro_id);
+        species_ref2 = r1.createProduct()
+        self.check(species_ref2, 'create product')
+        self.check(species_ref2.setSpecies(str(s2)[9:len(str(s2))-1]), \
+                    'assign product species')
+        self.check(species_ref2.setStoichiometry(int(len(product)/5)), \
+            		'set product stoichiometry')
+        if self.document.getLevel() == 3:
+            self.check(species_ref2.setConstant(True), \
+                    'set "constant" on species ref 2')
+        
         for param in local_params.keys():
             val = local_params.get(param);
             if self.document.getLevel() == 3:
