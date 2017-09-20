@@ -2,10 +2,18 @@
 """
 Created on Tue Jan 27 23:13:42 2015
 
-@author: carolc24
+@author: carolc24, Kyle Medley
 """
 
-import libsbml
+import warnings
+
+# try to import tesbml or libsbml
+# if both of these fail, libsbml cannot be imported - cannot continue
+try:
+    import tesbml as libsbml
+except ImportError:
+    import libsbml
+
 from math import isnan
 from re import sub
 
@@ -309,7 +317,7 @@ class sbmlModel(object):
         errors = self.document.checkConsistency();
         if (errors > 0):
             for i in range(errors):
-                print self.document.getError(i).getSeverityAsString(), ": ", self.document.getError(i).getMessage();
+                print(self.document.getError(i).getSeverityAsString(), ": ", self.document.getError(i).getMessage();)
 
         return libsbml.writeSBMLToString(self.document);
 
@@ -331,8 +339,7 @@ def writeCode(doc):
     command_list = [];
 
     if doc.getLevel() == 1:
-        print "Warning: SimpleSBML does not support Level 1 SBML models.  Before \
-        running this code, set the model to level 2 or 3."
+        warnings.warn('Warning: SimpleSBML does not support SBML Level 1.')
 
     props = libsbml.ConversionProperties()
     props.addOption('flatten comp', True)
