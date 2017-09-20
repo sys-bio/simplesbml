@@ -17,7 +17,7 @@ except ImportError:
 from math import isnan
 from re import sub
 
-__version__ = '1.2.1'
+__version__ = '1.2.2'
 
 class sbmlModel(object):
     def check(self, value, message):
@@ -132,7 +132,6 @@ class sbmlModel(object):
                 raise SystemExit(err_msg)
             s1 = self.model.getSpecies(re_id)
             species_ref1 = r1.createReactant()
-            print('set species {}'.format(s1.getId()))
             self.check(species_ref1,                       'create reactant')
             self.check(species_ref1.setSpecies(s1.getId()), \
                     'assign reactant species')
