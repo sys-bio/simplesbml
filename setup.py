@@ -9,9 +9,9 @@ from setuptools import setup
 
 setup(name='simplesbml',
       version='1.2.0',
-      description='A simplified interface for constructing SBML docs',
+      description='A simplified interface for constructing SBML docs.',
       author='Caroline Cannistra, Kyle Medley',
       author_email='tellurium-discuss@googlegroups.com',
-      url='http://sys-bio.github.io/simplesbml/index.html',
+      url='http://simplesbml.readthedocs.io/en/latest/',
       install_requires=['tesbml>=5.15.0'],
       packages=['simplesbml'])
