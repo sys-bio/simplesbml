@@ -2,7 +2,7 @@
 
 Thank you for downloading SimpleSBML!  This package supports easy SBML model construction and editing.
 
-The documentation can be found at: http://sys-bio.github.io/simplesbml/index.html
+The documentation can be found at: http://simplesbml.readthedocs.io/en/latest/
 
 libSBML documentation: http://sbml.org/Software/libSBML/docs/python-api/index.html
 
