@@ -2,7 +2,7 @@
 """
 Created on Thu Feb 12 16:19:07 2015
 
-@author: carolc24
+@author: carolc24, Kyle Medley
 """
 
 from setuptools import setup
