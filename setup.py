@@ -12,4 +12,6 @@ setup(name='simplesbml',
       description='A simplified interface for constructing SBML docs',
       author='Caroline Cannistra, Kyle Medley',
       author_email='tellurium-discuss@googlegroups.com',
+      url='http://sys-bio.github.io/simplesbml/index.html',
+      install_requires=['tesbml>=5.15.0'],
       packages=['simplesbml'])
