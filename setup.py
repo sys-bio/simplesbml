@@ -8,7 +8,7 @@ Created on Thu Feb 12 16:19:07 2015
 from setuptools import setup
 
 setup(name='simplesbml',
-      version='1.2.0',
+      version='1.2.1',
       description='A simplified interface for constructing SBML docs.',
       author='Caroline Cannistra, Kyle Medley',
       author_email='tellurium-discuss@googlegroups.com',

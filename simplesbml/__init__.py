@@ -17,7 +17,7 @@ except ImportError:
 from math import isnan
 from re import sub
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 class sbmlModel(object):
     def check(self, value, message):
@@ -31,7 +31,7 @@ class sbmlModel(object):
                 err_msg = 'Error trying to ' + message + '.' \
                 + 'LibSBML returned error code ' + str(value) + ': "'\
                 + libsbml.OperationReturnValue_toString(value).strip() + '"'
-            raise SystemExit(err_msg)
+            raise RuntimeError(err_msg)
         else:
             return
 
@@ -132,8 +132,9 @@ class sbmlModel(object):
                 raise SystemExit(err_msg)
             s1 = self.model.getSpecies(re_id)
             species_ref1 = r1.createReactant()
+            print('set species {}'.format(s1.getId()))
             self.check(species_ref1,                       'create reactant')
-            self.check(species_ref1.setSpecies(str(s1)[9:len(str(s1))-1]), \
+            self.check(species_ref1.setSpecies(s1.getId()), \
                     'assign reactant species')
             self.check(species_ref1.setStoichiometry(sto), \
             		'assign reactant stoichiometry')
@@ -157,7 +158,7 @@ class sbmlModel(object):
             s2 = self.model.getSpecies(pro_id)
             species_ref2 = r1.createProduct()
             self.check(species_ref2, 'create product')
-            self.check(species_ref2.setSpecies(str(s2)[9:len(str(s2))-1]), \
+            self.check(species_ref2.setSpecies(s2.getId()), \
                     'assign product species')
             self.check(species_ref2.setStoichiometry(sto), \
             		'set product stoichiometry')
