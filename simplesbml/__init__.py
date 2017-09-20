@@ -17,6 +17,8 @@ except ImportError:
 from math import isnan
 from re import sub
 
+__version__ = '1.2.0'
+
 class sbmlModel(object):
     def check(self, value, message):
         if value == None:
