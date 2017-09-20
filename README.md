@@ -15,6 +15,9 @@ SimpleSBML can be installed via pip:
 ```
 pip install simplesbml
 ```
+# Python version support
+
+SimpleSBML supports Python versions 2.7, 3.3, 3.4, 3.5, and 3.6. SimpleSBML is a pure Python package, but relies on libSBML, which must be compiled for each supported version.
 
 # Help
 
