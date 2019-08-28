@@ -13,5 +13,10 @@ setup(name='simplesbml',
       author='Caroline Cannistra, Kyle Medley',
       author_email='tellurium-discuss@googlegroups.com',
       url='http://simplesbml.readthedocs.io/en/latest/',
-      install_requires=['tesbml>=5.15.0'],
-      packages=['simplesbml'])
+      install_requires=[],
+      packages=['simplesbml'],
+      extras_require={
+          ':python_version=="3.7"': ['python-libsbml>=5.18.0'],
+          ':python_version<"3.7"': ['tesbml>=5.15.0']
+      }
+)
