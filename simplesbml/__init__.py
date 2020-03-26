@@ -62,7 +62,7 @@ class sbmlModel(object):
 
         self.addCompartment()
 
-    def addCompartment(self, vol=1, comp_id=''):
+    def addCompartment(self, vol=1, comp_id='', size_units = 'litre'):
         c1 = self.model.createCompartment()
         self.check(c1,                                 'create compartment')
         if len(comp_id) == 0:
@@ -72,7 +72,7 @@ class sbmlModel(object):
         self.check(c1.setSpatialDimensions(3),         'set compartment dimensions')
 
         self.check(c1.setSize(vol),                      'set compartment "size"')
-        self.check(c1.setUnits('litre'),               'set compartment size units')
+        self.check(c1.setUnits(size_units),               'set compartment size units')
         return c1
 
     def addSpecies(self, species_id, amt, comp='c1'):
