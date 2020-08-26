@@ -1,0 +1,906 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simplesbml &mdash; SimpleSBML 1.2.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> SimpleSBML
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.2.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimpleSBML</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>simplesbml</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for simplesbml</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Jan 27 23:13:42 2015, 2020</span>
+
+<span class="sd">@author: carolc24, Kyle Medle, hsauro</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># try to import tesbml or libsbml</span>
+<span class="c1"># if both of these fail, libsbml cannot be imported - cannot continue</span>
+<span class="k">try</span><span class="p">:</span>
+
+    <span class="kn">import</span> <span class="nn">tesbml</span> <span class="k">as</span> <span class="nn">libsbml</span>   
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">libsbml</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isnan</span>
+<span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">sub</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;1.3.0&#39;</span>
+
+<span class="k">def</span> <span class="nf">_isSBMLModel</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Tests if object is a libsbml model</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">cls_stg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+  <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;Model&#39;</span> <span class="ow">in</span> <span class="n">cls_stg</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;lib&#39;</span> <span class="ow">in</span> <span class="n">cls_stg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">True</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+<span class="k">def</span> <span class="nf">_checkSBMLDocument</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">modelReference</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span> 
+  <span class="k">if</span> <span class="p">(</span><span class="n">document</span><span class="o">.</span><span class="n">getNumErrors</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Errors in SBML document</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">modelReference</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_getXML</span><span class="p">(</span><span class="n">modelReference</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  :param str modelReference: </span>
+<span class="sd">      the input may be a file reference or a model string</span>
+<span class="sd">      or TextIOWrapper</span>
+<span class="sd">          and the file may be an xml file or an antimony file.</span>
+<span class="sd">      if it is a model string, it may be an xml string or antimony.</span>
+<span class="sd">  :raises IOError: Error encountered reading the SBML document</span>
+<span class="sd">  :return str SBML xml&quot;</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1"># Check for a file path</span>
+  <span class="n">modelStr</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+  <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modelReference</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">modelReference</span><span class="p">):</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">modelReference</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+      <span class="n">modelStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelStr</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;readlines&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">modelReference</span><span class="p">):</span>
+      <span class="n">lines</span> <span class="o">=</span> <span class="n">modelReference</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+      <span class="n">modelStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+      <span class="n">modelReference</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="c1"># Must be a string representation of a model</span>
+      <span class="n">modelStr</span> <span class="o">=</span> <span class="n">modelReference</span>
+  <span class="c1"># Process modelStr into a model  </span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;&lt;sbml&quot;</span> <span class="ow">in</span> <span class="n">modelStr</span><span class="p">:</span>
+    <span class="c1"># Antimony</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid SBML model.&quot;</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">modelStr</span>
+
+
+<div class="viewcode-block" id="sbmlModel"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel">[docs]</a><span class="k">class</span> <span class="nc">sbmlModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;LibSBML returned a null value trying to &#39;</span> <span class="o">+</span> \
+                    <span class="n">message</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">LIBSBML_OPERATION_SUCCESS</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">&#39;Error trying to &#39;</span> <span class="o">+</span> <span class="n">message</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> \
+                <span class="o">+</span> <span class="s1">&#39;LibSBML returned error code &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: &quot;&#39;</span>\
+                <span class="o">+</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">OperationReturnValue_toString</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_units</span><span class="o">=</span><span class="s1">&#39;second&#39;</span><span class="p">,</span> <span class="n">extent_units</span><span class="o">=</span><span class="s1">&#39;mole&#39;</span><span class="p">,</span> \
+                 <span class="n">sub_units</span><span class="o">=</span><span class="s1">&#39;mole&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">modelReference</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;Error: SimpleSBML does not support SBML level 1&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">document</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBMLDocument</span><span class="p">(</span><span class="n">level</span><span class="p">,</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;Could not create SBMLDocument object&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">modelReference</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">createModel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;create model&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setTimeUnits</span><span class="p">(</span><span class="n">time_units</span><span class="p">),</span> <span class="s1">&#39;set model-wide time units&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setExtentUnits</span><span class="p">(</span><span class="n">extent_units</span><span class="p">),</span> <span class="s1">&#39;set model units of extent&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setSubstanceUnits</span><span class="p">(</span><span class="n">sub_units</span><span class="p">),</span><span class="s1">&#39;set model substance units&#39;</span><span class="p">)</span>
+
+            <span class="n">per_second</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createUnitDefinition</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">per_second</span><span class="p">,</span>                         <span class="s1">&#39;create unit definition&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">per_second</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="s1">&#39;per_second&#39;</span><span class="p">),</span>     <span class="s1">&#39;set unit definition id&#39;</span><span class="p">)</span>
+            <span class="n">unit</span> <span class="o">=</span> <span class="n">per_second</span><span class="o">.</span><span class="n">createUnit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span>                               <span class="s1">&#39;create unit on per_second&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">setKind</span><span class="p">(</span><span class="n">libsbml</span><span class="o">.</span><span class="n">UNIT_KIND_SECOND</span><span class="p">),</span>     <span class="s1">&#39;set unit kind&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">setExponent</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>               <span class="s1">&#39;set unit exponent&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">setScale</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>                   <span class="s1">&#39;set unit scale&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">setMultiplier</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>              <span class="s1">&#39;set unit multiplier&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">addCompartment</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xml</span> <span class="o">=</span> <span class="n">_getXML</span><span class="p">(</span><span class="n">modelReference</span><span class="p">)</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBMLReader</span><span class="p">()</span>
+            <span class="n">document</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readSBMLFromString</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+            <span class="n">_checkSBMLDocument</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">modelReference</span><span class="o">=</span><span class="n">modelReference</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">getModel</span><span class="p">()</span>
+
+<div class="viewcode-block" id="sbmlModel.addCompartment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addCompartment">[docs]</a>    <span class="k">def</span> <span class="nf">addCompartment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">comp_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createCompartment</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span>                                 <span class="s1">&#39;create compartment&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comp_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">comp_id</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">comp_id</span><span class="p">),</span>                     <span class="s1">&#39;set compartment id&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">setConstant</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span>               <span class="s1">&#39;set compartment &quot;constant&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">setSpatialDimensions</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>         <span class="s1">&#39;set compartment dimensions&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">vol</span><span class="p">),</span>                      <span class="s1">&#39;set compartment &quot;size&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">setUnits</span><span class="p">(</span><span class="s1">&#39;litre&#39;</span><span class="p">),</span>               <span class="s1">&#39;set compartment size units&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c1</span></div>
+
+<div class="viewcode-block" id="sbmlModel.addSpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">addSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_id</span><span class="p">,</span> <span class="n">amt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;c1&#39;</span><span class="p">):</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createSpecies</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span>                           <span class="s1">&#39;create species s1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setCompartment</span><span class="p">(</span><span class="n">comp</span><span class="p">),</span>      <span class="s1">&#39;set species s1 compartment&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">species_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span> <span class="ow">and</span> <span class="n">species_id</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">species_id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setInitialConcentration</span><span class="p">(</span><span class="n">amt</span><span class="p">),</span>    <span class="s1">&#39;set initial concentration for s1&#39;</span><span class="p">)</span>
+            <span class="n">species_id</span> <span class="o">=</span> <span class="n">species_id</span><span class="p">[</span><span class="mi">1</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">species_id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setInitialAmount</span><span class="p">(</span><span class="n">amt</span><span class="p">),</span>     <span class="s1">&#39;set initial amount for s1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setSubstanceUnits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSubstanceUnits</span><span class="p">()),</span> <span class="s1">&#39;set substance units for s1&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">species_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;$&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setBoundaryCondition</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> \
+                    <span class="s1">&#39;set &quot;boundaryCondition&quot; on s1&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setConstant</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;set &quot;constant&quot; attribute on s1&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">species_id</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">species_id</span><span class="p">)]),</span> <span class="s1">&#39;set species s1 id&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setBoundaryCondition</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> \
+                    <span class="s1">&#39;set &quot;boundaryCondition&quot; on s1&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setConstant</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="s1">&#39;set &quot;constant&quot; attribute on s1&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">species_id</span><span class="p">),</span>  <span class="s1">&#39;set species s1 id&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setHasOnlySubstanceUnits</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> \
+                <span class="s1">&#39;set &quot;hasOnlySubstanceUnits&quot; on s1&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s1</span></div>
+
+<div class="viewcode-block" id="sbmlModel.addParameter"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addParameter">[docs]</a>    <span class="k">def</span> <span class="nf">addParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_id</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;per_second&#39;</span><span class="p">):</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createParameter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>                        <span class="s1">&#39;create parameter k&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">param_id</span><span class="p">),</span>        <span class="s1">&#39;set parameter k id&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">setConstant</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span>      <span class="s1">&#39;set parameter k &quot;not constant&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">),</span>          <span class="s1">&#39;set parameter k value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">setUnits</span><span class="p">(</span><span class="n">units</span><span class="p">),</span> <span class="s1">&#39;set parameter k units&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">k</span></div>
+
+<div class="viewcode-block" id="sbmlModel.addReaction"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addReaction">[docs]</a>    <span class="k">def</span> <span class="nf">addReaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="n">local_params</span><span class="o">=</span><span class="p">{},</span> <span class="n">rxn_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createReaction</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span>                         <span class="s1">&#39;create reaction&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rxn_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rxn_id</span> <span class="o">=</span> <span class="s1">&#39;v&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumReactions</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r1</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">rxn_id</span><span class="p">),</span>           <span class="s1">&#39;set reaction id&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r1</span><span class="o">.</span><span class="n">setReversible</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span>    <span class="s1">&#39;set reaction reversibility flag&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r1</span><span class="o">.</span><span class="n">setFast</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span>          <span class="s1">&#39;set reaction &quot;fast&quot; attribute&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">re</span> <span class="ow">in</span> <span class="n">reactants</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">re</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;$&#39;</span> <span class="ow">in</span> <span class="n">re</span><span class="p">:</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;$&#39;</span><span class="p">)</span>
+            <span class="n">re_split</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">re_split</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sto</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">re_id</span> <span class="o">=</span> <span class="n">re</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">re_split</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">re_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">sto</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re_split</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">re_id</span> <span class="o">=</span> <span class="n">re_split</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">&#39;Error: reactants must be listed in format </span><span class="se">\&#39;</span><span class="s1">S</span><span class="se">\&#39;</span><span class="s1"> or </span><span class="se">\&#39;</span><span class="s1">(float)</span><span class="se">\&#39;</span><span class="s1"> S</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+                <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="n">s1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">re_id</span><span class="p">)</span>
+            <span class="n">species_ref1</span> <span class="o">=</span> <span class="n">r1</span><span class="o">.</span><span class="n">createReactant</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref1</span><span class="p">,</span>                       <span class="s1">&#39;create reactant&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref1</span><span class="o">.</span><span class="n">setSpecies</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">getId</span><span class="p">()),</span> \
+                    <span class="s1">&#39;assign reactant species&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref1</span><span class="o">.</span><span class="n">setStoichiometry</span><span class="p">(</span><span class="n">sto</span><span class="p">),</span> \
+                    <span class="s1">&#39;assign reactant stoichiometry&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref1</span><span class="o">.</span><span class="n">setConstant</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> \
+                    <span class="s1">&#39;set &quot;constant&quot; on species ref 1&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">pro</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pro</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;$&#39;</span> <span class="ow">in</span> <span class="n">pro</span><span class="p">:</span>
+                <span class="n">pro</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;$&#39;</span><span class="p">)</span>
+            <span class="n">pro_split</span> <span class="o">=</span> <span class="n">pro</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pro_split</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sto</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">pro_id</span> <span class="o">=</span> <span class="n">pro</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pro_split</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">sto</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pro_split</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">pro_id</span> <span class="o">=</span> <span class="n">pro_split</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">&#39;Error: products must be listed in format </span><span class="se">\&#39;</span><span class="s1">S</span><span class="se">\&#39;</span><span class="s1"> or </span><span class="se">\&#39;</span><span class="s1">(float)</span><span class="se">\&#39;</span><span class="s1"> S</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+                <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="n">s2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">pro_id</span><span class="p">)</span>
+            <span class="n">species_ref2</span> <span class="o">=</span> <span class="n">r1</span><span class="o">.</span><span class="n">createProduct</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref2</span><span class="p">,</span> <span class="s1">&#39;create product&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref2</span><span class="o">.</span><span class="n">setSpecies</span><span class="p">(</span><span class="n">s2</span><span class="o">.</span><span class="n">getId</span><span class="p">()),</span> \
+                    <span class="s1">&#39;assign product species&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref2</span><span class="o">.</span><span class="n">setStoichiometry</span><span class="p">(</span><span class="n">sto</span><span class="p">),</span> \
+                    <span class="s1">&#39;set product stoichiometry&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">species_ref2</span><span class="o">.</span><span class="n">setConstant</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> \
+                    <span class="s1">&#39;set &quot;constant&quot; on species ref 2&#39;</span><span class="p">)</span>
+
+        <span class="n">math_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">math_ast</span><span class="p">,</span>    <span class="s1">&#39;create AST for rate expression&#39;</span><span class="p">)</span>
+
+        <span class="n">kinetic_law</span> <span class="o">=</span> <span class="n">r1</span><span class="o">.</span><span class="n">createKineticLaw</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">kinetic_law</span><span class="p">,</span>                   <span class="s1">&#39;create kinetic law&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">kinetic_law</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span> <span class="s1">&#39;set math on kinetic law&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">local_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">local_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">kinetic_law</span><span class="o">.</span><span class="n">createLocalParameter</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">kinetic_law</span><span class="o">.</span><span class="n">createParameter</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s1">&#39;create local parameter&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">param</span><span class="p">),</span> <span class="s1">&#39;set id of local parameter&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">),</span>   <span class="s1">&#39;set value of local parameter&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r1</span></div>
+
+<div class="viewcode-block" id="sbmlModel.addEvent"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addEvent">[docs]</a>    <span class="k">def</span> <span class="nf">addEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">assignments</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
+                 <span class="n">initial_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">e1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createEvent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">e1</span><span class="p">,</span>     <span class="s1">&#39;create event&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">event_id</span> <span class="o">=</span> <span class="s1">&#39;e&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumEvents</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">e1</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">event_id</span><span class="p">),</span>    <span class="s1">&#39;add id to event&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span><span class="o">==</span><span class="mi">3</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span><span class="o">==</span><span class="mi">2</span> \
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getVersion</span><span class="p">()</span><span class="o">==</span><span class="mi">4</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">e1</span><span class="o">.</span><span class="n">setUseValuesFromTriggerTime</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;set use values from trigger time&#39;</span><span class="p">)</span>
+
+        <span class="n">tri</span> <span class="o">=</span> <span class="n">e1</span><span class="o">.</span><span class="n">createTrigger</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">tri</span><span class="p">,</span>  <span class="s1">&#39;add trigger to event&#39;</span><span class="p">)</span>
+        <span class="n">tri_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="n">trigger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">tri</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">tri_ast</span><span class="p">),</span>     <span class="s1">&#39;add formula to trigger&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">tri</span><span class="o">.</span><span class="n">setPersistent</span><span class="p">(</span><span class="n">persistent</span><span class="p">),</span>   <span class="s1">&#39;set persistence of trigger&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">tri</span><span class="o">.</span><span class="n">setInitialValue</span><span class="p">(</span><span class="n">initial_value</span><span class="p">),</span> <span class="s1">&#39;set initial value of trigger&#39;</span><span class="p">)</span>
+
+        <span class="n">de</span> <span class="o">=</span> <span class="n">e1</span><span class="o">.</span><span class="n">createDelay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addParameter</span><span class="p">(</span><span class="n">event_id</span><span class="o">+</span><span class="s1">&#39;Delay&#39;</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getTimeUnits</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addParameter</span><span class="p">(</span><span class="n">event_id</span><span class="o">+</span><span class="s1">&#39;Delay&#39;</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">de</span><span class="p">,</span>               <span class="s1">&#39;add delay to event&#39;</span><span class="p">)</span>
+        <span class="n">delay_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">de</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">delay_ast</span><span class="p">),</span>     <span class="s1">&#39;set formula for delay&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">assignments</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">assign</span> <span class="o">=</span> <span class="n">e1</span><span class="o">.</span><span class="n">createEventAssignment</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">assign</span><span class="p">,</span>   <span class="s1">&#39;add event assignment to event&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">assign</span><span class="o">.</span><span class="n">setVariable</span><span class="p">(</span><span class="n">a</span><span class="p">),</span>  <span class="s1">&#39;add variable to event assignment&#39;</span><span class="p">)</span>
+            <span class="n">val_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="n">assignments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">assign</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">val_ast</span><span class="p">),</span>    <span class="s1">&#39;add value to event assignment&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">pri</span> <span class="o">=</span> <span class="n">e1</span><span class="o">.</span><span class="n">createPriority</span><span class="p">()</span>
+            <span class="n">pri_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">priority</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">pri</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">pri_ast</span><span class="p">),</span> <span class="s1">&#39;add priority to event&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">e1</span></div>
+
+<div class="viewcode-block" id="sbmlModel.addAssignmentRule"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addAssignmentRule">[docs]</a>    <span class="k">def</span> <span class="nf">addAssignmentRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createAssignmentRule</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="p">,</span>                        <span class="s1">&#39;create assignment rule r&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setVariable</span><span class="p">(</span><span class="n">var</span><span class="p">),</span>          <span class="s1">&#39;set assignment rule variable&#39;</span><span class="p">)</span>
+        <span class="n">math_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="n">math</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span> <span class="s1">&#39;set assignment rule equation&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="sbmlModel.addRateRule"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addRateRule">[docs]</a>    <span class="k">def</span> <span class="nf">addRateRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createRateRule</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="p">,</span>                        <span class="s1">&#39;create rate rule r&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setVariable</span><span class="p">(</span><span class="n">var</span><span class="p">),</span>          <span class="s1">&#39;set rate rule variable&#39;</span><span class="p">)</span>
+        <span class="n">math_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="n">math</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span> <span class="s1">&#39;set rate rule equation&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="sbmlModel.addInitialAssignment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addInitialAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">addInitialAssignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getVersion</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;Error: InitialAssignment does not exist for </span><span class="se">\</span>
+<span class="s1">                    this level and version.&#39;</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createInitialAssignment</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">a</span><span class="p">,</span>   <span class="s1">&#39;create initial assignment a&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">setSymbol</span><span class="p">(</span><span class="n">symbol</span><span class="p">),</span>    <span class="s1">&#39;set initial assignment a symbol&#39;</span><span class="p">)</span>
+        <span class="n">math_ast</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">parseL3Formula</span><span class="p">(</span><span class="n">math</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span>    <span class="s1">&#39;set initial assignment a math&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">a</span></div>
+
+    <span class="k">def</span> <span class="nf">setLevelAndVersion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkL2v1Compatibility</span><span class="p">(),</span> <span class="s1">&#39;convert to level 2 version 1&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkL2v2Compatibility</span><span class="p">(),</span> <span class="s1">&#39;convert to level 2 version 2&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkL2v3Compatibility</span><span class="p">(),</span> <span class="s1">&#39;convert to level 2 version 3&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkL2v4Compatibility</span><span class="p">(),</span> <span class="s1">&#39;convert to level 2 version 4&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkL3v1Compatibility</span><span class="p">(),</span> <span class="s1">&#39;convert to level 3 version 1&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;Invalid level/version combination&#39;</span><span class="p">)</span>
+
+        <span class="n">isSet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">setLevelAndVersion</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">isSet</span><span class="p">,</span> <span class="s1">&#39;convert to level &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; version &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
+
+<div class="viewcode-block" id="sbmlModel.getDocument"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getDocument">[docs]</a>    <span class="k">def</span> <span class="nf">getDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span></div>
+
+<div class="viewcode-block" id="sbmlModel.getModel"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getModel">[docs]</a>    <span class="k">def</span> <span class="nf">getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span></div>
+
+    <span class="k">def</span> <span class="nf">getNumCompartments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">()</span>   
+       
+    <span class="k">def</span> <span class="nf">getNumSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumSpecies</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">getNumParameters</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumParameters</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">getNumReactions</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumReactions</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">getNumEvents</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumEvents</span><span class="p">()</span>    
+
+    <span class="k">def</span> <span class="nf">getNumRules</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumRules</span><span class="p">()</span>  
+
+    <span class="k">def</span> <span class="nf">getNumFunctionDefinitions</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumFunctionDefinitions</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">getNumInitialAssignments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumInitialAssignments</span><span class="p">()</span> 
+    
+    <span class="k">def</span> <span class="nf">getSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_id</span><span class="p">):</span>      
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">species_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getListOfCompartments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nCompartments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">nCompartments</span><span class="p">):</span>
+           <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getCompartment</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+           <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">alist</span>
+    
+    <span class="k">def</span> <span class="nf">getCompartmentVolume</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getCompartment</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Compartment does not exist&#39;</span><span class="p">)</span> 
+        
+        
+        
+    <span class="k">def</span> <span class="nf">getListOfAllSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nSpecies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumSpecies</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">nSpecies</span><span class="p">):</span>
+           <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+           <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>         
+        <span class="k">return</span> <span class="n">alist</span>
+    
+    <span class="k">def</span> <span class="nf">getSpeciesInitialConcentration</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getInitialConcentration</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Species does not exist&#39;</span><span class="p">)</span> 
+        
+    <span class="k">def</span> <span class="nf">getSpeciesInitialAmount</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getInitialAmount</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Species does not exist&#39;</span><span class="p">)</span> 
+        
+    <span class="k">def</span> <span class="nf">getListOfFloatingSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nSpecies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumSpecies</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">nSpecies</span><span class="p">):</span>
+            <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">getBoundaryCondition</span><span class="p">():</span>
+               <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>         
+        <span class="k">return</span> <span class="n">alist</span>    
+
+    <span class="k">def</span> <span class="nf">getListOfBoundarySpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nSpecies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumSpecies</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">nSpecies</span><span class="p">):</span>
+            <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>            
+            <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">getBoundaryCondition</span><span class="p">():</span>
+               <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>         
+        <span class="k">return</span> <span class="n">alist</span>  
+    
+    <span class="k">def</span> <span class="nf">getNumFloatingSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getListOfFloatingSpecies</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">getNumBoundarySpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getListOfBoundarySpecies</span><span class="p">())</span>
+    
+    <span class="c1">#def getParameter(self, param_id):</span>
+    <span class="c1">#    return self.model.getParameter(param_id)</span>
+
+    <span class="k">def</span> <span class="nf">getListOfParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nParameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumParameters</span><span class="p">()</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">nParameters</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getParameter</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
+        <span class="k">return</span> <span class="n">alist</span>
+
+    <span class="k">def</span> <span class="nf">getParameterValue</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getParameter</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Parameter does not exist&#39;</span><span class="p">)</span>      
+        
+    <span class="k">def</span> <span class="nf">getListOfReactions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nReactions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumReactions</span><span class="p">()</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">nReactions</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
+        <span class="k">return</span> <span class="n">alist</span>
+    
+    <span class="k">def</span> <span class="nf">getNumReactants</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getNumReactants</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Reaction does not exist&#39;</span><span class="p">)</span>  
+        
+    <span class="k">def</span> <span class="nf">getNumProducts</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getNumProducts</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Reaction does not exist&#39;</span><span class="p">)</span> 
+        
+    <span class="k">def</span> <span class="nf">getRateLaw</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getKineticLaw</span><span class="p">()</span><span class="o">.</span><span class="n">getFormula</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Reaction does not exist&#39;</span><span class="p">)</span>      
+              
+    <span class="k">def</span> <span class="nf">getReactant</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">reactantIndex</span><span class="p">):</span>
+        <span class="n">ra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">reactionId</span><span class="p">)</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getReactant</span><span class="p">(</span><span class="n">reactantIndex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">getProduct</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">productIndex</span><span class="p">):</span>
+        <span class="n">ra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">reactionId</span><span class="p">)</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getProduct</span><span class="p">(</span><span class="n">productIndex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">getReactantStoichiometry</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">reactantIndex</span><span class="p">):</span>
+        <span class="n">ra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">reactionId</span><span class="p">)</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getReactant</span><span class="p">(</span><span class="n">reactantIndex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getStoichiometry</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">getProductStoichiometry</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">productIndex</span><span class="p">):</span>
+        <span class="n">ra</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span><span class="p">(</span><span class="n">reactionId</span><span class="p">)</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getProduct</span><span class="p">(</span><span class="n">productIndex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getStoichiometry</span> <span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">getListOfRules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nRules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumRules</span><span class="p">()</span> 
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">nRules</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
+        <span class="k">return</span> <span class="n">alist</span>
+    
+    <span class="c1"># def getReaction(self, rxn_id):</span>
+    <span class="c1">#     return self.model.getReaction(rxn_id)</span>
+
+    <span class="c1"># def getCompartment(self, comp_id):</span>
+    <span class="c1">#     return self.model.getCompartment(comp_id)</span>
+
+    <span class="c1"># def getListOfEvents(self):</span>
+    <span class="c1">#     return self.model.getListOfEvents()</span>
+
+    <span class="c1"># def getEvent(self, event_id):</span>
+    <span class="c1">#     return self.model.getEvent(event_id)</span>
+
+    <span class="c1"># def getRule(self, var):</span>
+    <span class="c1">#     return self.model.getRule(var)</span>
+
+    <span class="c1"># def getInitialAssignment(self, var):</span>
+    <span class="c1">#     return self.model.getInitialAssignment(var)</span>
+
+    <span class="c1"># def getListOfInitialAssignments(self):</span>
+    <span class="c1">#     return self.model.getListOfInitialAssignments()</span>
+
+<div class="viewcode-block" id="sbmlModel.toSBML"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.toSBML">[docs]</a>    <span class="k">def</span> <span class="nf">toSBML</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkConsistency</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">getSeverityAsString</span><span class="p">(),</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">getMessage</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">writeSBMLToString</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toSBML</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="writeCode"><a class="viewcode-back" href="../index.html#simplesbml.writeCode">[docs]</a><span class="k">def</span> <span class="nf">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+    <span class="n">comp_template</span> <span class="o">=</span> <span class="s1">&#39;model.addCompartment(vol=</span><span class="si">%s</span><span class="s1">, comp_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
+    <span class="n">species_template</span> <span class="o">=</span> <span class="s1">&#39;model.addSpecies(species_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, amt=</span><span class="si">%s</span><span class="s1">, comp=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
+    <span class="n">param_template</span> <span class="o">=</span> <span class="s1">&#39;model.addParameter(param_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, val=</span><span class="si">%s</span><span class="s1">, units=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
+    <span class="n">rxn_template</span> <span class="o">=</span> <span class="s1">&#39;model.addReaction(reactants=</span><span class="si">%s</span><span class="s1">, products=</span><span class="si">%s</span><span class="s1">, expression=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, local_params=</span><span class="si">%s</span><span class="s1">, rxn_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
+    <span class="n">event_template</span> <span class="o">=</span> <span class="s1">&#39;model.addEvent(trigger=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, assignments=</span><span class="si">%s</span><span class="s1">, persistent=</span><span class="si">%s</span><span class="s1">, initial_value=</span><span class="si">%s</span><span class="s1">, priority=</span><span class="si">%s</span><span class="s1">, delay=</span><span class="si">%s</span><span class="s1">, event_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
+    <span class="n">event_defaults</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">assignrule_template</span> <span class="o">=</span> <span class="s1">&#39;model.addAssignmentRule(var=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, math=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
+    <span class="n">raterule_template</span> <span class="o">=</span> <span class="s1">&#39;model.addRateRule(var=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, math=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
+    <span class="n">initassign_template</span> <span class="o">=</span> <span class="s1">&#39;model.addInitialAssignment(symbol=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, math=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">)&#39;</span>
+    <span class="n">init_template</span> <span class="o">=</span> <span class="s1">&#39;import simplesbml</span><span class="se">\n</span><span class="s1">model = simplesbml.sbmlModel(time_units=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, extent_units=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, sub_units=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, level=</span><span class="si">%s</span><span class="s1">, version=</span><span class="si">%s</span><span class="s1">);&#39;</span>
+    <span class="n">init_defaults</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">,</span> <span class="s1">&#39;mole&#39;</span><span class="p">,</span> <span class="s1">&#39;mole&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">command_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Warning: SimpleSBML does not support SBML Level 1.&#39;</span><span class="p">)</span>
+
+    <span class="n">props</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">ConversionProperties</span><span class="p">()</span>
+    <span class="n">props</span><span class="o">.</span><span class="n">addOption</span><span class="p">(</span><span class="s1">&#39;flatten comp&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">result</span> <span class="o">!=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">LIBSBML_OPERATION_SUCCESS</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;Conversion failed: (&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">getModel</span><span class="p">()</span>
+    <span class="n">comps</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getListOfCompartments</span><span class="p">()</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getListOfSpecies</span><span class="p">()</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getListOfParameters</span><span class="p">()</span>
+    <span class="n">rxns</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getListOfReactions</span><span class="p">()</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getListOfEvents</span><span class="p">()</span>
+    <span class="n">rules</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getListOfRules</span><span class="p">()</span>
+    <span class="n">inits</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">doc</span><span class="o">.</span><span class="n">getVersion</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">inits</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getListOfInitialAssignments</span><span class="p">()</span>
+
+    <span class="n">timeUnits</span> <span class="o">=</span> <span class="s1">&#39;second&#39;</span>
+    <span class="n">substanceUnits</span> <span class="o">=</span> <span class="s1">&#39;mole&#39;</span>
+    <span class="n">extentUnits</span> <span class="o">=</span> <span class="s1">&#39;mole&#39;</span>
+    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">timeUnits</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getTimeUnits</span><span class="p">()</span>
+        <span class="n">extentUnits</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getExtentUnits</span><span class="p">()</span>
+        <span class="n">substanceUnits</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getSubstanceUnits</span><span class="p">()</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">getVersion</span><span class="p">()</span>
+    <span class="n">init_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">timeUnits</span><span class="p">,</span> <span class="n">extentUnits</span><span class="p">,</span> <span class="n">substanceUnits</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">version</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">init_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">init_defaults</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">init_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;del&#39;</span>
+
+    <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">init_template</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="n">init_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">init_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">init_list</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">init_list</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">init_list</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+
+    <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">comps</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;c1&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span> <span class="ow">and</span> <span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">()[</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">())]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mf">1e-15</span><span class="p">:</span>
+                    <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_template</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">,</span> <span class="s1">&#39;del&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">getSize</span><span class="p">(),</span> <span class="s1">&#39;del&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mf">1e-15</span><span class="p">:</span>
+                    <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_template</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">()))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">getSize</span><span class="p">(),</span> <span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">()))</span>
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">species</span><span class="p">:</span>
+        <span class="n">conc</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getInitialConcentration</span><span class="p">()</span>
+        <span class="n">amt</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getInitialAmount</span><span class="p">()</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">getCompartment</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;c1&#39;</span><span class="p">:</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="s1">&#39;del&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getCompartment</span><span class="p">()</span>
+        <span class="n">bc</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">getBoundaryCondition</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">bc</span><span class="p">:</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="s2">&quot;$&quot;</span> <span class="o">+</span> <span class="n">sid</span>
+        <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="n">conc</span><span class="p">)</span> <span class="ow">or</span> <span class="n">amt</span> <span class="o">&gt;</span> <span class="n">conc</span><span class="p">:</span>
+            <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">species_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">amt</span><span class="p">),</span> <span class="n">comp</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">species_template</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="n">sid</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">conc</span><span class="p">),</span> <span class="n">comp</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">getUnits</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;per_second&#39;</span><span class="p">:</span>
+            <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;del&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">units</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getUnits</span><span class="p">()</span>
+        <span class="n">isDelay</span> <span class="o">=</span> <span class="n">pid</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Delay&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isDelay</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">units</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rxns</span><span class="p">:</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">vid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;v&#39;</span> <span class="ow">and</span> <span class="n">vid</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">vid</span><span class="p">)]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="n">vid</span> <span class="o">=</span> <span class="s1">&#39;del&#39;</span>
+        <span class="n">reactants</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">getListOfReactants</span><span class="p">():</span>
+            <span class="n">reactants</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getStoichiometry</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;1.0 &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">products</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">getListOfProducts</span><span class="p">():</span>
+            <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getStoichiometry</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;1.0 &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToString</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">getKineticLaw</span><span class="p">()</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span>
+        <span class="n">local_params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">local_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">local_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">getKineticLaw</span><span class="p">()</span><span class="o">.</span><span class="n">getListOfParameters</span><span class="p">():</span>
+            <span class="n">local_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>
+            <span class="n">local_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">getValue</span><span class="p">())</span>
+        <span class="n">local_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">local_ids</span><span class="p">,</span> <span class="n">local_values</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_params</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">local_params</span> <span class="o">=</span> <span class="s1">&#39;del&#39;</span>
+        <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rxn_template</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">reactants</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> \
+                    <span class="n">expr</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">local_params</span><span class="p">),</span> <span class="n">vid</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+        <span class="n">persistent</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">initialValue</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">priority</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+        <span class="n">eid</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eid</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">eid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;e&#39;</span> <span class="ow">and</span> <span class="n">eid</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">eid</span><span class="p">)]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()):</span>
+            <span class="n">eid</span> <span class="o">=</span> <span class="s1">&#39;del&#39;</span>
+        <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">persistent</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">getTrigger</span><span class="p">()</span><span class="o">.</span><span class="n">getPersistent</span><span class="p">()</span>
+            <span class="n">initialValue</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">getTrigger</span><span class="p">()</span><span class="o">.</span><span class="n">getInitialValue</span><span class="p">()</span>
+            <span class="n">priority</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">getPriority</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">priority</span><span class="p">)</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">Priority</span><span class="p">:</span>
+                <span class="n">priority</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">priority</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">priority</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+        <span class="n">tri</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">getTrigger</span><span class="p">()</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span>
+        <span class="n">did</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">getDelay</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">did</span><span class="p">)</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">Delay</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">did</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+        <span class="n">assigns</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">getListOfEventAssignments</span><span class="p">()</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">assign</span> <span class="ow">in</span> <span class="n">assigns</span><span class="p">:</span>
+            <span class="n">var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">assign</span><span class="o">.</span><span class="n">getVariable</span><span class="p">())</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">assign</span><span class="o">.</span><span class="n">getMath</span><span class="p">()))</span>
+        <span class="n">assigns</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
+
+        <span class="n">event_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">persistent</span><span class="p">,</span> <span class="n">initialValue</span><span class="p">,</span> <span class="n">priority</span><span class="p">,</span> <span class="n">delay</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">event_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">event_defaults</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">event_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;del&#39;</span>
+
+        <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">tri</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">assigns</span><span class="p">),</span> \
+                <span class="n">event_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">event_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">event_list</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">event_list</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">eid</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
+        <span class="n">sym</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">getVariable</span><span class="p">()</span>
+        <span class="n">math</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ASSIGNMENT_RULE</span><span class="p">:</span>
+            <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">assignrule_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="n">math</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">r</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_RATE_RULE</span><span class="p">:</span>
+            <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raterule_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="n">math</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">next</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inits</span><span class="p">:</span>
+        <span class="n">sym</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">getSymbol</span><span class="p">()</span>
+        <span class="n">math</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span>
+        <span class="n">command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">initassign_template</span> <span class="o">%</span> <span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="n">math</span><span class="p">))</span>
+
+    <span class="n">commands</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command_list</span><span class="p">)</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="s1">&#39;\w+=</span><span class="se">\&#39;</span><span class="s1">?del</span><span class="se">\&#39;</span><span class="s1">?(?=[,)])&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="s1">&#39;\((, )+&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="s1">&#39;(, )+\)&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
+    <span class="n">commands</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="s1">&#39;(, )+&#39;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">commands</span></div>
+
+<div class="viewcode-block" id="writeCodeFromFile"><a class="viewcode-back" href="../index.html#simplesbml.writeCodeFromFile">[docs]</a><span class="k">def</span> <span class="nf">writeCodeFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBMLReader</span><span class="p">()</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readSBMLFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">getNumErrors</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="writeCodeFromString"><a class="viewcode-back" href="../index.html#simplesbml.writeCodeFromString">[docs]</a><span class="k">def</span> <span class="nf">writeCodeFromString</span><span class="p">(</span><span class="n">sbmlstring</span><span class="p">):</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBMLReader</span><span class="p">()</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readSBMLFromString</span><span class="p">(</span><span class="n">sbmlstring</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Caroline Cannistra
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
