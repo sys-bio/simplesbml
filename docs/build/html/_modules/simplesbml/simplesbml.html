@@ -7,12 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>simplesbml &mdash; SimpleSBML 1.2.2 documentation</title>
+  <title>simplesbml.simplesbml &mdash; SimpleSBML 1.2.2 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
 
   
   
@@ -21,21 +21,21 @@
 
   
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> SimpleSBML
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> SimpleSBML
           
 
           
@@ -66,7 +66,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -99,7 +99,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">SimpleSBML</a>
+          <a href="../../index.html">SimpleSBML</a>
         
       </nav>
 
@@ -128,11 +128,13 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="index.html">Module code</a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>simplesbml</li>
+          <li><a href="../simplesbml.html">simplesbml</a> &raquo;</li>
+        
+      <li>simplesbml.simplesbml</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -147,8 +149,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for simplesbml</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+  <h1>Source code for simplesbml.simplesbml</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Jan 27 23:13:42 2015, 2020</span>
+
+<span class="sd">@author: carolc24, Kyle Medle, hsauro</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c1"># try to import tesbml or libsbml</span>
 <span class="c1"># if both of these fail, libsbml cannot be imported - cannot continue</span>
@@ -161,8 +170,6 @@
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isnan</span>
 <span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">sub</span>
 <span class="kn">import</span> <span class="nn">os</span>
-
-<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;1.3.0&#39;</span>
 
 <span class="k">def</span> <span class="nf">_isSBMLModel</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;</span>
@@ -212,21 +219,7 @@
   <span class="k">return</span> <span class="n">modelStr</span>
 
 
-<div class="viewcode-block" id="sbmlModel"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel">[docs]</a><span class="k">class</span> <span class="nc">sbmlModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
-    <span class="sd">&quot;&quot;&quot;sbmlModel is used to construct simple models using libSBML methods and</span>
-<span class="sd">    print out the model in SBML format.  A user can add species, parameters,</span>
-<span class="sd">    reactions, events, assignment rules, rate rules, and initial assignments</span>
-<span class="sd">    to a model.  Then, the user can view the model in SBML format by printing</span>
-<span class="sd">    the string representation of the class.</span>
-
-<span class="sd">    sbmlModel contains two attributes: *document*, an</span>
-<span class="sd">    `SBMLDocument &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_s_b_m_l_document.html&gt;`_</span>
-<span class="sd">    object, an</span>
-<span class="sd">    *model*, the</span>
-<span class="sd">    `Model &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html&gt;`_</span>
-<span class="sd">    attribute of *document*.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel">[docs]</a><span class="k">class</span> <span class="nc">sbmlModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;LibSBML returned a null value trying to &#39;</span> <span class="o">+</span> \
@@ -277,13 +270,7 @@
             <span class="n">_checkSBMLDocument</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">modelReference</span><span class="o">=</span><span class="n">modelReference</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">getModel</span><span class="p">()</span>
 
-<div class="viewcode-block" id="sbmlModel.addCompartment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addCompartment">[docs]</a>    <span class="k">def</span> <span class="nf">addCompartment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">comp_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Adds a `Compartment &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_compartment.html&gt;`_</span>
-<span class="sd">        of volume *vol* litres to the model.  The default volume is 1 litre. If the user does</span>
-<span class="sd">        not specify *comp_id*, the id is set to &#39;c&lt;n&gt;&#39; where the new compartment</span>
-<span class="sd">        is the nth compartment added to the model. All sbmlModel objects are</span>
-<span class="sd">        initialized with a default compartment &#39;c1&#39;.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.addCompartment"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addCompartment">[docs]</a>    <span class="k">def</span> <span class="nf">addCompartment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">comp_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="n">c1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createCompartment</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span>                                 <span class="s1">&#39;create compartment&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comp_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -296,15 +283,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">setUnits</span><span class="p">(</span><span class="s1">&#39;litre&#39;</span><span class="p">),</span>               <span class="s1">&#39;set compartment size units&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">c1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addSpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">addSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_id</span><span class="p">,</span> <span class="n">amt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;c1&#39;</span><span class="p">):</span>
-        
-        <span class="sd">&quot;&quot;&quot;Adds a `Species &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_species.html&gt;`_</span>
-<span class="sd">        to the model.  If *species_id* starts</span>
-<span class="sd">        with the &#39;$&#39; symbol, the species is set as a boundary condition.  If</span>
-<span class="sd">        *species_id* is enclosed in brackets, the *amt* is the initial</span>
-<span class="sd">        concentration of species within the specified compartment in mol/L.</span>
-<span class="sd">        Otherwise, *amt* is the initial amount of species in moles.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.addSpecies"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">addSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_id</span><span class="p">,</span> <span class="n">amt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;c1&#39;</span><span class="p">):</span>
         <span class="n">s1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createSpecies</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span>                           <span class="s1">&#39;create species s1&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">setCompartment</span><span class="p">(</span><span class="n">comp</span><span class="p">),</span>      <span class="s1">&#39;set species s1 compartment&#39;</span><span class="p">)</span>
@@ -328,13 +307,7 @@
                 <span class="s1">&#39;set &quot;hasOnlySubstanceUnits&quot; on s1&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">s1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addParameter"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addParameter">[docs]</a>    <span class="k">def</span> <span class="nf">addParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_id</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;per_second&#39;</span><span class="p">):</span>
-        
-        <span class="sd">&quot;&quot;&quot;Adds a `Parameter &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_parameter.html&gt;`_</span>
-<span class="sd">        to the model.  *val* is the value of the parameter, and</span>
-<span class="sd">        *param_id* is the parameter id.  If units are not specified by the user,</span>
-<span class="sd">        the default units are 1/sec.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.addParameter"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addParameter">[docs]</a>    <span class="k">def</span> <span class="nf">addParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_id</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;per_second&#39;</span><span class="p">):</span>
         <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createParameter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="p">,</span>                        <span class="s1">&#39;create parameter k&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">setId</span><span class="p">(</span><span class="n">param_id</span><span class="p">),</span>        <span class="s1">&#39;set parameter k id&#39;</span><span class="p">)</span>
@@ -343,26 +316,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">setUnits</span><span class="p">(</span><span class="n">units</span><span class="p">),</span> <span class="s1">&#39;set parameter k units&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">k</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addReaction"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addReaction">[docs]</a>    <span class="k">def</span> <span class="nf">addReaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="n">local_params</span><span class="o">=</span><span class="p">{},</span> <span class="n">rxn_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        
-        <span class="sd">&quot;&quot;&quot;Adds a `Reaction &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_reaction.html&gt;`_</span>
-<span class="sd">        to the model.</span>
-
-<span class="sd">        *reactants* and *products* are lists of species</span>
-<span class="sd">        ids that the user wishes to define as reactants and products, respectively.</span>
-<span class="sd">        If one of these lists contains a string with a number followed by a species</span>
-<span class="sd">        id (i.e. &#39;2 G6P&#39;) then the number is interpreted as the stoichiometry of</span>
-<span class="sd">        the species.  Otherwise it is assumed to be 1.</span>
-
-<span class="sd">        *expression* is a string that represents the reaction rate expression.</span>
-
-<span class="sd">        *local_params* is a dictionary where the keys are local parameter ids and</span>
-<span class="sd">        the values are the desired values of the respective parameters.</span>
-
-<span class="sd">        If the</span>
-<span class="sd">        user does not define a reaction id, it is set as &#39;v&lt;n&gt;&#39; where the new</span>
-<span class="sd">        reaction is the nth reaction added.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.addReaction"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addReaction">[docs]</a>    <span class="k">def</span> <span class="nf">addReaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="n">local_params</span><span class="o">=</span><span class="p">{},</span> <span class="n">rxn_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createReaction</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span>                         <span class="s1">&#39;create reaction&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rxn_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -436,39 +390,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">),</span>   <span class="s1">&#39;set value of local parameter&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addEvent"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addEvent">[docs]</a>    <span class="k">def</span> <span class="nf">addEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">assignments</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
+<div class="viewcode-block" id="sbmlModel.addEvent"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addEvent">[docs]</a>    <span class="k">def</span> <span class="nf">addEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">assignments</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
                  <span class="n">initial_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        
-        
-        <span class="sd">&quot;&quot;&quot;Adds an `Event &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_event.html&gt;`_</span>
-<span class="sd">        to the model.</span>
-
-<span class="sd">        *trigger* is the string representation of a</span>
-<span class="sd">        logical expression that defines when an event is &#39;triggered&#39;, meaning</span>
-<span class="sd">        when the event is ready to be executed.</span>
-
-<span class="sd">        *delay* is a numerical value that defines the amount of time between when</span>
-<span class="sd">        the event is triggered and when the event assignment is implemented, in</span>
-<span class="sd">        previously defined model-wide time units.</span>
-
-<span class="sd">        *assignments* is a dictionary</span>
-<span class="sd">        where the keys are variables to be changed and the values are the</span>
-<span class="sd">        variables&#39; new values.</span>
-
-<span class="sd">        *persistent* is a boolean that defines whether the</span>
-<span class="sd">        event will still be executed if the trigger switches from ``True`` to ``False``</span>
-<span class="sd">        between the event&#39;s trigger and its execution.</span>
-
-<span class="sd">        *initial_value* is the value of *trigger* when t &lt; 0.</span>
-
-<span class="sd">        *priority* is a numerical value that determines</span>
-<span class="sd">        which event is executed if two events are executed at the same time.  The</span>
-<span class="sd">        event with the larger ``priority`` is executed.</span>
-
-<span class="sd">        .. note:: An event is only triggered when the trigger switches from ``False`` to</span>
-<span class="sd">            ``True``.  If the trigger&#39;s initial value is ``True``, the event will not be</span>
-<span class="sd">            triggered until the value switches to ``False`` and then back to ``True``.&quot;&quot;&quot;</span>
-
         <span class="n">e1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createEvent</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">e1</span><span class="p">,</span>     <span class="s1">&#39;create event&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event_id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -508,14 +431,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">pri</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">pri_ast</span><span class="p">),</span> <span class="s1">&#39;add priority to event&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">e1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addAssignmentRule"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addAssignmentRule">[docs]</a>    <span class="k">def</span> <span class="nf">addAssignmentRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
-        
-        <span class="sd">&quot;&quot;&quot;Adds an `AssignmentRule &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_assignment_rule.html&gt;`_</span>
-<span class="sd">        to the model.  An assignment rule is an equation</span>
-<span class="sd">        where one side is equal to the value of a state variable and the other side</span>
-<span class="sd">        is equal to some expression.  *var* is the id of the state variable and *math*</span>
-<span class="sd">        is the string representation of the expression.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.addAssignmentRule"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addAssignmentRule">[docs]</a>    <span class="k">def</span> <span class="nf">addAssignmentRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createAssignmentRule</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="p">,</span>                        <span class="s1">&#39;create assignment rule r&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setVariable</span><span class="p">(</span><span class="n">var</span><span class="p">),</span>          <span class="s1">&#39;set assignment rule variable&#39;</span><span class="p">)</span>
@@ -523,15 +439,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span> <span class="s1">&#39;set assignment rule equation&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addRateRule"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addRateRule">[docs]</a>    <span class="k">def</span> <span class="nf">addRateRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
- 
-        <span class="sd">&quot;&quot;&quot;Adds a `RateRule &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_rate_rule.html&gt;`_</span>
-<span class="sd">        to the model.  A rate rule is similar to an assignment</span>
-<span class="sd">        rule, but instead of describing a state variable&#39;s value as an</span>
-<span class="sd">        expression, it describes the derivative of the state variable&#39;s value</span>
-<span class="sd">        with respect to time as an expression.  *var* is the id of the state variable</span>
-<span class="sd">        and *math* is the string representation of the expression.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.addRateRule"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addRateRule">[docs]</a>    <span class="k">def</span> <span class="nf">addRateRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createRateRule</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="p">,</span>                        <span class="s1">&#39;create rate rule r&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setVariable</span><span class="p">(</span><span class="n">var</span><span class="p">),</span>          <span class="s1">&#39;set rate rule variable&#39;</span><span class="p">)</span>
@@ -539,15 +447,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span> <span class="s1">&#39;set rate rule equation&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addInitialAssignment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addInitialAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">addInitialAssignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
-        
-        <span class="sd">&quot;&quot;&quot;Adds an `InitialAssignment &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_initial_assignment.html&gt;`_</span>
-<span class="sd">        to the model.  If the</span>
-<span class="sd">        initial value of a variable depends on other variables or parameters, this</span>
-<span class="sd">        method can be used to define an expression that describes the initial value</span>
-<span class="sd">        of the variable in terms of other variables or parameters.  *symbol* is the</span>
-<span class="sd">        id of the variable and *math* is the string representation of the expression.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.addInitialAssignment"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.addInitialAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">addInitialAssignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getLevel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getVersion</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="s1">&#39;Error: InitialAssignment does not exist for </span><span class="se">\</span>
 <span class="s1">                    this level and version.&#39;</span><span class="p">)</span>
@@ -575,26 +475,17 @@
         <span class="n">isSet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">setLevelAndVersion</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">isSet</span><span class="p">,</span> <span class="s1">&#39;convert to level &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; version &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
 
-<div class="viewcode-block" id="sbmlModel.getDocument"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getDocument">[docs]</a>    <span class="k">def</span> <span class="nf">getDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
-        <span class="sd">&quot;&quot;&quot;Returns the</span>
-<span class="sd">        `SBMLDocument &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_s_b_m_l_document.html&gt;`_</span>
-<span class="sd">        object of the sbmlModel.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.getDocument"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.getDocument">[docs]</a>    <span class="k">def</span> <span class="nf">getDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getModel"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getModel">[docs]</a>    <span class="k">def</span> <span class="nf">getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the</span>
-<span class="sd">        `Model &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html&gt;`_</span>
-<span class="sd">        object of the sbmlModel.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.getModel"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.getModel">[docs]</a>    <span class="k">def</span> <span class="nf">getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getNumCompartments"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumCompartments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumCompartments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getNumCompartments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of compartments in the current model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">()</span>   </div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">()</span>   
        
     <span class="k">def</span> <span class="nf">getNumSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumSpecies</span><span class="p">()</span>
@@ -634,7 +525,7 @@
            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Compartment does not exist&#39;</span><span class="p">)</span> 
         
-     
+        
         
     <span class="k">def</span> <span class="nf">getListOfAllSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
@@ -772,10 +663,7 @@
     <span class="c1"># def getListOfInitialAssignments(self):</span>
     <span class="c1">#     return self.model.getListOfInitialAssignments()</span>
 
-<div class="viewcode-block" id="sbmlModel.toSBML"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.toSBML">[docs]</a>    <span class="k">def</span> <span class="nf">toSBML</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the model in SBML format as a string.  Also checks model consistency</span>
-<span class="sd">       and prints all errors and warnings.&quot;&quot;&quot;</span>
-
+<div class="viewcode-block" id="sbmlModel.toSBML"><a class="viewcode-back" href="../../index.html#simplesbml.sbmlModel.toSBML">[docs]</a>    <span class="k">def</span> <span class="nf">toSBML</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkConsistency</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
@@ -787,9 +675,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toSBML</span><span class="p">()</span></div>
 
 <span class="k">def</span> <span class="nf">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a string containing calls to SimpleSBML functions that reproduce</span>
-<span class="sd">    the model contained in the SBMLDocument *doc* in an sbmlModel object.&quot;&quot;&quot;</span>
-
     <span class="n">comp_template</span> <span class="o">=</span> <span class="s1">&#39;model.addCompartment(vol=</span><span class="si">%s</span><span class="s1">, comp_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
     <span class="n">species_template</span> <span class="o">=</span> <span class="s1">&#39;model.addSpecies(species_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, amt=</span><span class="si">%s</span><span class="s1">, comp=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
     <span class="n">param_template</span> <span class="o">=</span> <span class="s1">&#39;model.addParameter(param_id=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, val=</span><span class="si">%s</span><span class="s1">, units=</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">);&#39;</span>
@@ -963,10 +848,6 @@
     <span class="k">return</span> <span class="n">commands</span>
 
 <span class="k">def</span> <span class="nf">writeCodeFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Reads the file saved under *filename* as an SBML format model and</span>
-<span class="sd">    returns a string containing calls to SimpleSBML functions that reproduce</span>
-<span class="sd">    the model in an sbmlModel object.&quot;&quot;&quot;</span>
-
     <span class="n">reader</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBMLReader</span><span class="p">()</span>
     <span class="n">doc</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readSBMLFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">getNumErrors</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -974,11 +855,6 @@
     <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">writeCodeFromString</span><span class="p">(</span><span class="n">sbmlstring</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Reads *sbmlstring* as an SBML format model and</span>
-<span class="sd">    returns a string containing calls to SimpleSBML functions that reproduce</span>
-<span class="sd">    the model in an sbmlModel object.&quot;&quot;&quot;</span>
-
-
     <span class="n">reader</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBMLReader</span><span class="p">()</span>
     <span class="n">doc</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readSBMLFromString</span><span class="p">(</span><span class="n">sbmlstring</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
