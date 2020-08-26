@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Jan 27 23:13:42 2015
+Created on Tue Jan 27 23:13:42 2015, 2020
 
-@author: carolc24, Kyle Medley
+@author: carolc24, Kyle Medle, hsauro
 """
 
 import warnings
@@ -10,14 +10,64 @@ import warnings
 # try to import tesbml or libsbml
 # if both of these fail, libsbml cannot be imported - cannot continue
 try:
-    import tesbml as libsbml
+
+    import tesbml as libsbml   
 except ImportError:
     import libsbml
 
 from math import isnan
 from re import sub
+import os
 
-__version__ = '1.2.2'
+__version__ = '1.3.0'
+
+def _isSBMLModel(obj):
+  """
+  Tests if object is a libsbml model
+  """
+  cls_stg = str(type(obj))
+  if ('Model' in cls_stg) and ('lib' in cls_stg):
+    return True
+  else:
+    return False
+
+def _checkSBMLDocument(document, modelReference=""): 
+  if (document.getNumErrors() > 0):
+    raise ValueError("Errors in SBML document\n%s" % modelReference)
+
+def _getXML(modelReference):
+  """
+  :param str modelReference: 
+      the input may be a file reference or a model string
+      or TextIOWrapper
+          and the file may be an xml file or an antimony file.
+      if it is a model string, it may be an xml string or antimony.
+  :raises IOError: Error encountered reading the SBML document
+  :return str SBML xml"
+  """
+  # Check for a file path
+  modelStr = ""
+  if isinstance(modelReference, str):
+    if os.path.isfile(modelReference):
+      with open(modelReference, 'r') as fd:
+        lines = fd.readlines()
+      modelStr = ''.join(lines)
+  if len(modelStr) == 0:
+    if "readlines" in dir(modelReference):
+      lines = modelReference.readlines()
+      if isinstance(lines[0], bytes):
+        lines = [l.decode("utf-8") for l in lines]
+      modelStr = ''.join(lines)
+      modelReference.close()
+    else:
+      # Must be a string representation of a model
+      modelStr = modelReference
+  # Process modelStr into a model  
+  if not "<sbml" in modelStr:
+    # Antimony
+    raise ValueError("Invalid SBML model.")
+  return modelStr
+
 
 class sbmlModel(object):
     def check(self, value, message):
@@ -36,31 +86,39 @@ class sbmlModel(object):
             return
 
     def __init__(self, time_units='second', extent_units='mole', \
-                 sub_units='mole', level=3, version=1):
+                 sub_units='mole', level=3, version=1, modelReference=None):
         if level == 1:
             raise SystemExit('Error: SimpleSBML does not support SBML level 1')
         try:
             self.document = libsbml.SBMLDocument(level,version)
         except ValueError:
             raise SystemExit('Could not create SBMLDocument object')
-        self.model = self.document.createModel()
-        self.check(self.model, 'create model')
-        if self.document.getLevel() == 3:
-            self.check(self.model.setTimeUnits(time_units), 'set model-wide time units')
-            self.check(self.model.setExtentUnits(extent_units), 'set model units of extent')
-            self.check(self.model.setSubstanceUnits(sub_units),'set model substance units')
+        
+        if modelReference == None:
+            self.model = self.document.createModel()
+            self.check(self.model, 'create model')
+            if self.document.getLevel() == 3:
+                self.check(self.model.setTimeUnits(time_units), 'set model-wide time units')
+                self.check(self.model.setExtentUnits(extent_units), 'set model units of extent')
+                self.check(self.model.setSubstanceUnits(sub_units),'set model substance units')
 
-        per_second = self.model.createUnitDefinition()
-        self.check(per_second,                         'create unit definition')
-        self.check(per_second.setId('per_second'),     'set unit definition id')
-        unit = per_second.createUnit()
-        self.check(unit,                               'create unit on per_second')
-        self.check(unit.setKind(libsbml.UNIT_KIND_SECOND),     'set unit kind')
-        self.check(unit.setExponent(-1),               'set unit exponent')
-        self.check(unit.setScale(0),                   'set unit scale')
-        self.check(unit.setMultiplier(1),              'set unit multiplier')
+            per_second = self.model.createUnitDefinition()
+            self.check(per_second,                         'create unit definition')
+            self.check(per_second.setId('per_second'),     'set unit definition id')
+            unit = per_second.createUnit()
+            self.check(unit,                               'create unit on per_second')
+            self.check(unit.setKind(libsbml.UNIT_KIND_SECOND),     'set unit kind')
+            self.check(unit.setExponent(-1),               'set unit exponent')
+            self.check(unit.setScale(0),                   'set unit scale')
+            self.check(unit.setMultiplier(1),              'set unit multiplier')
 
-        self.addCompartment()
+            self.addCompartment()
+        else:
+            xml = _getXML(modelReference)
+            reader = libsbml.SBMLReader()
+            document = reader.readSBMLFromString(xml)
+            _checkSBMLDocument(document, modelReference=modelReference)
+            self.model = document.getModel()
 
     def addCompartment(self, vol=1, comp_id=''):
         c1 = self.model.createCompartment()
@@ -83,7 +141,7 @@ class sbmlModel(object):
             self.check(s1.setInitialConcentration(amt),    'set initial concentration for s1')
             species_id = species_id[1:(len(species_id)-1)]
         else:
-        	self.check(s1.setInitialAmount(amt),     'set initial amount for s1')
+            self.check(s1.setInitialAmount(amt),     'set initial amount for s1')
         self.check(s1.setSubstanceUnits(self.model.getSubstanceUnits()), 'set substance units for s1')
         if species_id[0] == '$':
             self.check(s1.setBoundaryCondition(True), \
@@ -136,7 +194,7 @@ class sbmlModel(object):
             self.check(species_ref1.setSpecies(s1.getId()), \
                     'assign reactant species')
             self.check(species_ref1.setStoichiometry(sto), \
-            		'assign reactant stoichiometry')
+                    'assign reactant stoichiometry')
             if self.document.getLevel() == 3:
                 self.check(species_ref1.setConstant(True), \
                     'set "constant" on species ref 1')
@@ -160,7 +218,7 @@ class sbmlModel(object):
             self.check(species_ref2.setSpecies(s2.getId()), \
                     'assign product species')
             self.check(species_ref2.setStoichiometry(sto), \
-            		'set product stoichiometry')
+                    'set product stoichiometry')
             if self.document.getLevel() == 3:
                 self.check(species_ref2.setConstant(True), \
                     'set "constant" on species ref 2')
@@ -273,47 +331,184 @@ class sbmlModel(object):
     def getModel(self):
         return self.model
 
-    def getSpecies(self, species_id):
+    def getNumCompartments (self):
+        return self.model.getNumCompartments()   
+       
+    def getNumSpecies (self):
+        return self.model.getNumSpecies()
+
+    def getNumParameters (self):
+        return self.model.getNumParameters()
+    
+    def getNumReactions (self):
+        return self.model.getNumReactions()
+
+    def getNumEvents (self):
+        return self.model.getNumEvents()    
+
+    def getNumRules (self):
+        return self.model.getNumRules()  
+
+    def getNumFunctionDefinitions (self):
+        return self.model.getNumFunctionDefinitions()
+    
+    def getNumInitialAssignments (self):
+        return self.model.getNumInitialAssignments() 
+    
+    def getSpecies(self, species_id):      
         return self.model.getSpecies(species_id)
 
-    def getListOfSpecies(self):
-        return self.model.getListOfSpecies()
+    def getListOfCompartments(self):
+        alist = []
+        nCompartments = self.model.getNumCompartments()
+        for i in range (nCompartments):
+           comp = self.model.getCompartment(i)
+           alist.append (comp.getId())
+        return alist
+    
+    def getCompartmentVolume (self, Id):
+        p = self.model.getCompartment(Id)
+        if p != None:
+           return p.getVolume()
+        raise Exception ('Compartment does not exist') 
+        
+        
+        
+    def getListOfAllSpecies(self):
+        alist = []
+        nSpecies = self.model.getNumSpecies()
+        for i in range (nSpecies):
+           sp = self.model.getSpecies(i)
+           alist.append (sp.getId())         
+        return alist
+    
+    def getSpeciesInitialConcentration (self, Id):
+        p = self.model.getSpecies(Id)
+        if p != None:
+           return p.getInitialConcentration()
+        raise Exception ('Species does not exist') 
+        
+    def getSpeciesInitialAmount (self, Id):
+        p = self.model.getSpecies(Id)
+        if p != None:
+           return p.getInitialAmount()
+        raise Exception ('Species does not exist') 
+        
+    def getListOfFloatingSpecies(self):
+        alist = []
+        nSpecies = self.model.getNumSpecies()
+        for i in range (nSpecies):
+            sp = self.model.getSpecies(i)
+            if not sp.getBoundaryCondition():
+               alist.append (sp.getId())         
+        return alist    
 
-    def getParameter(self, param_id):
-        return self.model.getParameter(param_id)
+    def getListOfBoundarySpecies(self):
+        alist = []
+        nSpecies = self.model.getNumSpecies()
+        for i in range (nSpecies):
+            sp = self.model.getSpecies(i)            
+            if sp.getBoundaryCondition():
+               alist.append (sp.getId())         
+        return alist  
+    
+    def getNumFloatingSpecies (self):
+        return len (self.getListOfFloatingSpecies())
+
+    def getNumBoundarySpecies (self):
+        return len (self.getListOfBoundarySpecies())
+    
+    #def getParameter(self, param_id):
+    #    return self.model.getParameter(param_id)
 
     def getListOfParameters(self):
-        return self.model.getListOfParameters()
+        alist = []
+        nParameters = self.model.getNumParameters() 
+        for i in range (nParameters):
+            p = self.model.getParameter(i)
+            alist.append (p.getId())             
+        return alist
 
-    def getReaction(self, rxn_id):
-        return self.model.getReaction(rxn_id)
-
+    def getParameterValue (self, Id):
+        p = self.model.getParameter(Id)
+        if p != None:
+           return p.getValue()
+        raise Exception ('Parameter does not exist')      
+        
     def getListOfReactions(self):
-        return self.model.getListOfReactions()
+        alist = []
+        nReactions = self.model.getNumReactions() 
+        for i in range (nReactions):
+            p = self.model.getReaction(i)
+            alist.append (p.getId())             
+        return alist
+    
+    def getNumReactants (self, Id):
+        p = self.model.getReaction(Id)
+        if p != None:
+           return p.getNumReactants()
+        raise Exception ('Reaction does not exist')  
+        
+    def getNumProducts (self, Id):
+        p = self.model.getReaction(Id)
+        if p != None:
+           return p.getNumProducts()
+        raise Exception ('Reaction does not exist') 
+        
+    def getRateLaw (self, Id):
+        p = self.model.getReaction(Id)
+        if p != None:
+           return p.getKineticLaw().getFormula()
+        raise Exception ('Reaction does not exist')      
+              
+    def getReactant (self, reactionId, reactantIndex):
+        ra = self.model.getReaction(reactionId)
+        sr = ra.getReactant(reactantIndex)
+        return sr.getSpecies()
+    
+    def getProduct (self, reactionId, productIndex):
+        ra = self.model.getReaction(reactionId)
+        sr = ra.getProduct(productIndex)
+        return sr.getSpecies()
+    
+    def getReactantStoichiometry (self, reactionId, reactantIndex):
+        ra = self.model.getReaction(reactionId)
+        sr = ra.getReactant(reactantIndex)
+        return sr.getStoichiometry ()
 
-    def getCompartment(self, comp_id):
-        return self.model.getCompartment(comp_id)
-
-    def getListOfEvents(self):
-        return self.model.getListOfEvents()
-
-    def getEvent(self, event_id):
-        return self.model.getEvent(event_id)
-
-    def getListOfCompartments(self):
-        return self.model.getListOfCompartments()
-
-    def getRule(self, var):
-        return self.model.getRule(var)
-
+    def getProductStoichiometry (self, reactionId, productIndex):
+        ra = self.model.getReaction(reactionId)
+        sr = ra.getProduct(productIndex)
+        return sr.getStoichiometry ()
+        
     def getListOfRules(self):
-        return self.model.getListOfRules()
+        alist = []
+        nRules = self.model.getNumRules() 
+        for i in range (nRules):
+            p = self.model.getRule(i)
+            alist.append (p.getId())             
+        return alist
+    
+    # def getReaction(self, rxn_id):
+    #     return self.model.getReaction(rxn_id)
 
-    def getInitialAssignment(self, var):
-        return self.model.getInitialAssignment(var)
+    # def getCompartment(self, comp_id):
+    #     return self.model.getCompartment(comp_id)
 
-    def getListOfInitialAssignments(self):
-        return self.model.getListOfInitialAssignments()
+    # def getListOfEvents(self):
+    #     return self.model.getListOfEvents()
+
+    # def getEvent(self, event_id):
+    #     return self.model.getEvent(event_id)
+
+    # def getRule(self, var):
+    #     return self.model.getRule(var)
+
+    # def getInitialAssignment(self, var):
+    #     return self.model.getInitialAssignment(var)
+
+    # def getListOfInitialAssignments(self):
+    #     return self.model.getListOfInitialAssignments()
 
     def toSBML(self):
         errors = self.document.checkConsistency()
