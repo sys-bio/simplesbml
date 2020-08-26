@@ -9,7 +9,7 @@
 Welcome to the SimpleSBML documentation!
 ========================================
 
-Mary had a little lamb
+Mary had a little dog
 
 This page describes the SimpleSBML package and its contents.  To install
 SimpleSBML, go to
