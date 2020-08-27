@@ -3,6 +3,7 @@ import warnings
 # try to import tesbml or libsbml
 # if both of these fail, libsbml cannot be imported - cannot continue
 try:
+
     import tesbml as libsbml   
 except ImportError:
     import libsbml
@@ -11,9 +12,7 @@ from math import isnan
 from re import sub
 import os
 
-# --------------------------------
 # Version info is in __init__.py
-# --------------------------------
 
 def _isSBMLModel(obj):
   """
@@ -25,43 +24,9 @@ def _isSBMLModel(obj):
   else:
     return False
 
-def _checkSBMLDocument(document, modelReference=""): 
+def _checkSBMLDocument(document): 
   if (document.getNumErrors() > 0):
-    raise ValueError("Errors in SBML document\n%s" % modelReference)
-
-def _getXML(modelReference):
-  """
-  :param str modelReference: 
-      the input may be a file reference or a model string
-      or TextIOWrapper
-          and the file may be an xml file or an antimony file.
-      if it is a model string, it may be an xml string or antimony.
-  :raises IOError: Error encountered reading the SBML document
-  :return str SBML xml"
-  """
-  # Check for a file path
-  modelStr = ""
-  if isinstance(modelReference, str):
-    if os.path.isfile(modelReference):
-      with open(modelReference, 'r') as fd:
-        lines = fd.readlines()
-      modelStr = ''.join(lines)
-  if len(modelStr) == 0:
-    if "readlines" in dir(modelReference):
-      lines = modelReference.readlines()
-      if isinstance(lines[0], bytes):
-        lines = [l.decode("utf-8") for l in lines]
-      modelStr = ''.join(lines)
-      modelReference.close()
-    else:
-      # Must be a string representation of a model
-      modelStr = modelReference
-  # Process modelStr into a model  
-  if not "<sbml" in modelStr:
-    # Antimony
-    raise ValueError("Invalid SBML model.")
-  return modelStr
-
+    raise ValueError("Errors in SBML document")
 
 class sbmlModel(object):
 
@@ -82,26 +47,11 @@ class sbmlModel(object):
     You can also pass a SBML string and use simlesbml to obtain information about the model
     using the get methods, e.g
        
-    s = simplesbml.sbmlModel (sbmlStr=mySBMLString)
+    model = simplesbml.sbmlModel (sbmlStr=mySBMLString)
     """
 
-    def _check(self, value, message):
-        if value == None:
-            raise SystemExit('LibSBML returned a null value trying to ' + \
-                    message + '.')
-        elif type(value) is int:
-            if value == libsbml.LIBSBML_OPERATION_SUCCESS:
-                return
-            else:
-                err_msg = 'Error trying to ' + message + '.' \
-                + 'LibSBML returned error code ' + str(value) + ': "'\
-                + libsbml.OperationReturnValue_toString(value).strip() + '"'
-            raise RuntimeError(err_msg)
-        else:
-            return
-
     def __init__(self, time_units='second', extent_units='mole', \
-                 sub_units='mole', level=3, version=1, sbmlStr=None):
+                 sub_units='mole', level=3, version=1, sbmlStr=None, sbmlFile=None):
         if level == 1:
             raise SystemExit('Error: SimpleSBML does not support SBML level 1')
         try:
@@ -109,7 +59,10 @@ class sbmlModel(object):
         except ValueError:
             raise SystemExit('Could not create SBMLDocument object')
         
-        if sbmlStr == None:
+        if (sbmlFile != None) and (sbmlStr != None):
+           raise Exception.Create ('Only select a string or file as the source of the SBML, not both')
+
+        if (sbmlFile == None) and (sbmlStr == None): # They want to create a new model
             self.model = self.document.createModel()
             self._check(self.model, 'create model')
             if self.document.getLevel() == 3:
@@ -129,11 +82,36 @@ class sbmlModel(object):
 
             self.addCompartment()
         else:
-            xml = _getXML(sbmlStr)
-            reader = libsbml.SBMLReader()
-            document = reader.readSBMLFromString(xml)
-            _checkSBMLDocument(document, modelReference=sbmlStr)
-            self.model = document.getModel()
+            if sbmlStr != None:
+                reader = libsbml.SBMLReader()  
+                self.document = reader.readSBMLFromString(sbmlStr)
+
+            if sbmlFile != None:
+                if os.path.isfile(sbmlFile):
+                   with open(sbmlFile, 'r') as fd:
+                        xml = fd.read()
+                   reader = libsbml.SBMLReader()  
+                   self.document = reader.readSBMLFromString(xml)
+                else:
+                   raise Exception ('Specified file name does not appear to be a file?')    
+
+            _checkSBMLDocument(self.document)
+            self.model = self.document.getModel()
+             
+    def _check(self, value, message):
+        if value == None:
+            raise SystemExit('LibSBML returned a null value trying to ' + \
+                    message + '.')
+        elif type(value) is int:
+            if value == libsbml.LIBSBML_OPERATION_SUCCESS:
+                return
+            else:
+                err_msg = 'Error trying to ' + message + '.' \
+                + 'LibSBML returned error code ' + str(value) + ': "'\
+                + libsbml.OperationReturnValue_toString(value).strip() + '"'
+            raise RuntimeError(err_msg)
+        else:
+            return
 
     def addCompartment(self, vol=1, comp_id=''):
         """Adds a `Compartment <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_compartment.html>`_
@@ -143,15 +121,15 @@ class sbmlModel(object):
         initialized with a default compartment 'c1'."""
 
         c1 = self.model.createCompartment()
-        self.check(c1,                                 'create compartment')
+        self._check(c1,                                 'create compartment')
         if len(comp_id) == 0:
             comp_id = 'c' + str(self.model.getNumCompartments())
-        self.check(c1.setId(comp_id),                     'set compartment id')
-        self.check(c1.setConstant(True),               'set compartment "constant"')
-        self.check(c1.setSpatialDimensions(3),         'set compartment dimensions')
+        self._check(c1.setId(comp_id),                     'set compartment id')
+        self._check(c1.setConstant(True),               'set compartment "constant"')
+        self._check(c1.setSpatialDimensions(3),         'set compartment dimensions')
 
-        self.check(c1.setSize(vol),                      'set compartment "size"')
-        self.check(c1.setUnits('litre'),               'set compartment size units')
+        self._check(c1.setSize(vol),                      'set compartment "size"')
+        self._check(c1.setUnits('litre'),               'set compartment size units')
         return c1
 
     def addSpecies(self, species_id, amt, comp='c1'):
@@ -164,25 +142,25 @@ class sbmlModel(object):
         Otherwise, *amt* is the initial amount of species in moles."""
 
         s1 = self.model.createSpecies()
-        self.check(s1,                           'create species s1')
-        self.check(s1.setCompartment(comp),      'set species s1 compartment')
+        self._check(s1,                           'create species s1')
+        self._check(s1.setCompartment(comp),      'set species s1 compartment')
         if species_id[0] == '[' and species_id[len(species_id)-1] == ']':
-            self.check(s1.setInitialConcentration(amt),    'set initial concentration for s1')
+            self._check(s1.setInitialConcentration(amt),    'set initial concentration for s1')
             species_id = species_id[1:(len(species_id)-1)]
         else:
-            self.check(s1.setInitialAmount(amt),     'set initial amount for s1')
-        self.check(s1.setSubstanceUnits(self.model.getSubstanceUnits()), 'set substance units for s1')
+            self._check(s1.setInitialAmount(amt),     'set initial amount for s1')
+        self._check(s1.setSubstanceUnits(self.model.getSubstanceUnits()), 'set substance units for s1')
         if species_id[0] == '$':
-            self.check(s1.setBoundaryCondition(True), \
+            self._check(s1.setBoundaryCondition(True), \
                     'set "boundaryCondition" on s1')
-            self.check(s1.setConstant(False), 'set "constant" attribute on s1')
-            self.check(s1.setId(species_id[1:len(species_id)]), 'set species s1 id')
+            self._check(s1.setConstant(False), 'set "constant" attribute on s1')
+            self._check(s1.setId(species_id[1:len(species_id)]), 'set species s1 id')
         else:
-            self.check(s1.setBoundaryCondition(False), \
+            self._check(s1.setBoundaryCondition(False), \
                     'set "boundaryCondition" on s1')
-            self.check(s1.setConstant(False), 'set "constant" attribute on s1')
-            self.check(s1.setId(species_id),  'set species s1 id')
-        self.check(s1.setHasOnlySubstanceUnits(False), \
+            self._check(s1.setConstant(False), 'set "constant" attribute on s1')
+            self._check(s1.setId(species_id),  'set species s1 id')
+        self._check(s1.setHasOnlySubstanceUnits(False), \
                 'set "hasOnlySubstanceUnits" on s1')
         return s1
 
@@ -193,11 +171,11 @@ class sbmlModel(object):
         the default units are 1/sec."""
 
         k = self.model.createParameter()
-        self.check(k,                        'create parameter k')
-        self.check(k.setId(param_id),        'set parameter k id')
-        self.check(k.setConstant(False),      'set parameter k "not constant"')
-        self.check(k.setValue(val),          'set parameter k value')
-        self.check(k.setUnits(units), 'set parameter k units')
+        self._check(k,                        'create parameter k')
+        self._check(k.setId(param_id),        'set parameter k id')
+        self._check(k.setConstant(False),      'set parameter k "not constant"')
+        self._check(k.setValue(val),          'set parameter k value')
+        self._check(k.setUnits(units), 'set parameter k units')
         return k
 
     def addReaction(self, reactants, products, expression, local_params={}, rxn_id=''):      
@@ -220,12 +198,12 @@ class sbmlModel(object):
         reaction is the nth reaction added."""
 
         r1 = self.model.createReaction()
-        self.check(r1,                         'create reaction')
+        self._check(r1,                         'create reaction')
         if len(rxn_id) == 0:
             rxn_id = 'v' + str(self.model.getNumReactions())
-        self.check(r1.setId(rxn_id),           'set reaction id')
-        self.check(r1.setReversible(False),    'set reaction reversibility flag')
-        self.check(r1.setFast(False),          'set reaction "fast" attribute')
+        self._check(r1.setId(rxn_id),           'set reaction id')
+        self._check(r1.setReversible(False),    'set reaction reversibility flag')
+        self._check(r1.setFast(False),          'set reaction "fast" attribute')
 
         for re in reactants:
             if re is not None and '$' in re:
@@ -242,13 +220,13 @@ class sbmlModel(object):
                 raise SystemExit(err_msg)
             s1 = self.model.getSpecies(re_id)
             species_ref1 = r1.createReactant()
-            self.check(species_ref1,                       'create reactant')
-            self.check(species_ref1.setSpecies(s1.getId()), \
+            self._check(species_ref1,                       'create reactant')
+            self._check(species_ref1.setSpecies(s1.getId()), \
                     'assign reactant species')
-            self.check(species_ref1.setStoichiometry(sto), \
+            self._check(species_ref1.setStoichiometry(sto), \
                     'assign reactant stoichiometry')
             if self.document.getLevel() == 3:
-                self.check(species_ref1.setConstant(True), \
+                self._check(species_ref1.setConstant(True), \
                     'set "constant" on species ref 1')
 
         for pro in products:
@@ -266,30 +244,30 @@ class sbmlModel(object):
                 raise SystemExit(err_msg)
             s2 = self.model.getSpecies(pro_id)
             species_ref2 = r1.createProduct()
-            self.check(species_ref2, 'create product')
-            self.check(species_ref2.setSpecies(s2.getId()), \
+            self._check(species_ref2, 'create product')
+            self._check(species_ref2.setSpecies(s2.getId()), \
                     'assign product species')
-            self.check(species_ref2.setStoichiometry(sto), \
+            self._check(species_ref2.setStoichiometry(sto), \
                     'set product stoichiometry')
             if self.document.getLevel() == 3:
-                self.check(species_ref2.setConstant(True), \
+                self._check(species_ref2.setConstant(True), \
                     'set "constant" on species ref 2')
 
         math_ast = libsbml.parseL3Formula(expression)
-        self.check(math_ast,    'create AST for rate expression')
+        self._check(math_ast,    'create AST for rate expression')
 
         kinetic_law = r1.createKineticLaw()
-        self.check(kinetic_law,                   'create kinetic law')
-        self.check(kinetic_law.setMath(math_ast), 'set math on kinetic law')
+        self._check(kinetic_law,                   'create kinetic law')
+        self._check(kinetic_law.setMath(math_ast), 'set math on kinetic law')
         for param in local_params.keys():
             val = local_params.get(param)
             if self.document.getLevel() == 3:
                 p = kinetic_law.createLocalParameter()
             else:
                 p = kinetic_law.createParameter()
-            self.check(p, 'create local parameter')
-            self.check(p.setId(param), 'set id of local parameter')
-            self.check(p.setValue(val),   'set value of local parameter')
+            self._check(p, 'create local parameter')
+            self._check(p.setId(param), 'set id of local parameter')
+            self._check(p.setValue(val),   'set value of local parameter')
         return r1
 
     def addEvent(self, trigger, assignments, persistent=True, \
@@ -324,42 +302,42 @@ class sbmlModel(object):
             triggered until the value switches to ``False`` and then back to ``True``."""
 
         e1 = self.model.createEvent()
-        self.check(e1,     'create event')
+        self._check(e1,     'create event')
         if len(event_id) == 0:
             event_id = 'e' + str(self.model.getNumEvents())
-        self.check(e1.setId(event_id),    'add id to event')
+        self._check(e1.setId(event_id),    'add id to event')
         if self.document.getLevel()==3 or (self.document.getLevel()==2 \
                     and self.document.getVersion()==4):
-            self.check(e1.setUseValuesFromTriggerTime(True), 'set use values from trigger time')
+            self._check(e1.setUseValuesFromTriggerTime(True), 'set use values from trigger time')
 
         tri = e1.createTrigger()
-        self.check(tri,  'add trigger to event')
+        self._check(tri,  'add trigger to event')
         tri_ast = libsbml.parseL3Formula(trigger)
-        self.check(tri.setMath(tri_ast),     'add formula to trigger')
+        self._check(tri.setMath(tri_ast),     'add formula to trigger')
         if self.document.getLevel() == 3:
-            self.check(tri.setPersistent(persistent),   'set persistence of trigger')
-            self.check(tri.setInitialValue(initial_value), 'set initial value of trigger')
+            self._check(tri.setPersistent(persistent),   'set persistence of trigger')
+            self._check(tri.setInitialValue(initial_value), 'set initial value of trigger')
 
         de = e1.createDelay()
         if self.document.getLevel() == 3:
             k = self.addParameter(event_id+'Delay', delay, self.model.getTimeUnits())
         else:
             k = self.addParameter(event_id+'Delay', delay, 'time')
-        self.check(de,               'add delay to event')
+        self._check(de,               'add delay to event')
         delay_ast = libsbml.parseL3Formula(k.getId())
-        self.check(de.setMath(delay_ast),     'set formula for delay')
+        self._check(de.setMath(delay_ast),     'set formula for delay')
 
         for a in assignments.keys():
             assign = e1.createEventAssignment()
-            self.check(assign,   'add event assignment to event')
-            self.check(assign.setVariable(a),  'add variable to event assignment')
+            self._check(assign,   'add event assignment to event')
+            self._check(assign.setVariable(a),  'add variable to event assignment')
             val_ast = libsbml.parseL3Formula(assignments.get(a))
-            self.check(assign.setMath(val_ast),    'add value to event assignment')
+            self._check(assign.setMath(val_ast),    'add value to event assignment')
 
         if self.document.getLevel() == 3:
             pri = e1.createPriority()
             pri_ast = libsbml.parseL3Formula(str(priority))
-            self.check(pri.setMath(pri_ast), 'add priority to event')
+            self._check(pri.setMath(pri_ast), 'add priority to event')
         return e1
 
     def addAssignmentRule(self, var, math):
@@ -371,10 +349,10 @@ class sbmlModel(object):
         is the string representation of the expression."""
 
         r = self.model.createAssignmentRule()
-        self.check(r,                        'create assignment rule r')
-        self.check(r.setVariable(var),          'set assignment rule variable')
+        self._check(r,                        'create assignment rule r')
+        self._check(r.setVariable(var),          'set assignment rule variable')
         math_ast = libsbml.parseL3Formula(math)
-        self.check(r.setMath(math_ast), 'set assignment rule equation')
+        self._check(r.setMath(math_ast), 'set assignment rule equation')
         return r
 
     def addRateRule(self, var, math):
@@ -387,10 +365,10 @@ class sbmlModel(object):
         and *math* is the string representation of the expression."""
 
         r = self.model.createRateRule()
-        self.check(r,                        'create rate rule r')
-        self.check(r.setVariable(var),          'set rate rule variable')
+        self._check(r,                        'create rate rule r')
+        self._check(r.setVariable(var),          'set rate rule variable')
         math_ast = libsbml.parseL3Formula(math)
-        self.check(r.setMath(math_ast), 'set rate rule equation')
+        self._check(r.setMath(math_ast), 'set rate rule equation')
         return r
 
     def addInitialAssignment(self, symbol, math):
@@ -406,42 +384,44 @@ class sbmlModel(object):
             raise SystemExit('Error: InitialAssignment does not exist for \
                     this level and version.')
         a = self.model.createInitialAssignment()
-        self.check(a,   'create initial assignment a')
-        self.check(a.setSymbol(symbol),    'set initial assignment a symbol')
+        self._check(a,   'create initial assignment a')
+        self._check(a.setSymbol(symbol),    'set initial assignment a symbol')
         math_ast = libsbml.parseL3Formula(math)
-        self.check(a.setMath(math_ast),    'set initial assignment a math')
+        self._check(a.setMath(math_ast),    'set initial assignment a math')
         return a
 
     def setLevelAndVersion(self, level, version):
         if level == 2 and version == 1:
-            self.check(self.document.checkL2v1Compatibility(), 'convert to level 2 version 1')
+            self._check(self.document.checkL2v1Compatibility(), 'convert to level 2 version 1')
         elif level == 2 and version == 2:
-            self.check(self.document.checkL2v2Compatibility(), 'convert to level 2 version 2')
+            self._check(self.document.checkL2v2Compatibility(), 'convert to level 2 version 2')
         elif level == 2 and version == 3:
-            self.check(self.document.checkL2v3Compatibility(), 'convert to level 2 version 3')
+            self._check(self.document.checkL2v3Compatibility(), 'convert to level 2 version 3')
         elif level == 2 and version == 4:
-            self.check(self.document.checkL2v4Compatibility(), 'convert to level 2 version 4')
+            self._check(self.document.checkL2v4Compatibility(), 'convert to level 2 version 4')
         elif level == 3 and version == 1:
-            self.check(self.document.checkL3v1Compatibility(), 'convert to level 3 version 1')
+            self._check(self.document.checkL3v1Compatibility(), 'convert to level 3 version 1')
         else:
             raise SystemExit('Invalid level/version combination')
 
         isSet = self.document.setLevelAndVersion(level, version)
-        self.check(isSet, 'convert to level ' + str(level) + ' version ' + str(version))
+        self._check(isSet, 'convert to level ' + str(level) + ' version ' + str(version))
 
     def getDocument(self):
         
         """Returns the
         `SBMLDocument <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_s_b_m_l_document.html>`_
-        object of the sbmlModel."""
+        object of the sbmlModel. 
 
+        This is not something you need to care about unless you need direct access to libsbml"""
         return self.document
 
     def getModel(self):
         """Returns the
         `Model <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html>`_
-        object of the sbmlModel."""
+        object of the sbmlModel.
 
+        This is not something you need to care about unless you need direct access to libsbml"""
         return self.model
 
     def getNumCompartments (self):
@@ -533,18 +513,53 @@ class sbmlModel(object):
            alist.append (sp.getId())         
         return alist
     
+    def isSpeciesValueSet (self, Id):
+        """
+        Returns true if the species has been set a value (concentration or amount).
+
+        Example: if model.isSpeciesValueSet ('ATP'):
+        """
+        p = self.model.getSpecies(Id)
+        if p == None:
+           raise Exception ('Species does not exist')  
+        if p.isSetInitialConcentration() or p.isSetInitialAmount():
+            return True
+        else:
+            return False
+
     def getSpeciesInitialConcentration (self, Id):
+        """
+        Returns the initial values for the concentration of a species with given Id
+
+        The species can be an index to the indexth species or the Id of the species. You can get the Ids by calling getListOfSpecies()
+
+        Example: value = model.getSpeciesInitialConcentration ('Glucose')
+        """
         p = self.model.getSpecies(Id)
-        if p != None:
+        if p == None:
+           raise Exception ('Species does not exist')             
+        if p.isSetInitialConcentration() == True:
            return p.getInitialConcentration()
-        raise Exception ('Species does not exist') 
+        else:
+           raise Exception ('Species has not been initialized with a concentration')
         
+
     def getSpeciesInitialAmount (self, Id):
+        """
+        Returns the initial values for the amount of a species with given Id
+
+        The species can be an index to the indexth species or the Id of the species. You can get the Ids by calling getListOfSpecies()
+
+        Example: value = model.getSpeciesInitialAmount ('Glucose')
+        """
         p = self.model.getSpecies(Id)
-        if p != None:
+        if p == None:
+           raise Exception ('Species does not exist')   
+        if p.isSetInitialAmount():
            return p.getInitialAmount()
-        raise Exception ('Species does not exist') 
-        
+        else:
+           raise Exception ('Species has not been initialized with an amount') 
+         
     def getListOfFloatingSpecies(self):
         """
         Returns a list of all floating species Ids.
@@ -595,18 +610,34 @@ class sbmlModel(object):
             alist.append (p.getId())             
         return alist
 
+    
+    def isParameterValueSet (self, Id):
+        """
+        Returns true if the parameter has been assigned a value
+
+        Example: if model.isParameterValueSet ('k1'):
+
+        """
+        p = self.model.getParameter(Id)
+        if p == None:
+           raise Exception ('Parameter does not exist')  
+        if p.isSetValue():
+            return True
+        else:
+            return False
+
     def getParameterValue (self, Id):
         """
+        Returns the value for a given model parameter.
+
         **Parameters**
         
            Id: the Id of the parameter in question
-           
-        **Returns**
-        
-           The value of the specified parameter
+
+        Example: value = model.getParameterValue ('k1')       
         """      
         p = self.model.getParameter(Id)
-        if p != None:
+        if p.isSetValue():
            return p.getValue()
         raise Exception ('Parameter does not exist')      
         
@@ -623,13 +654,13 @@ class sbmlModel(object):
     
     def getNumReactants (self, Id):
         """
+         Returns the number of reactants in the reaction given by the Id argument.
+
         **Parameters**
         
            Id (string): The Id of the reaction in question.
-           
-        **Returns**
-        
-           The number of reactants in the specified reaction.
+
+        Example: numProducts = model.getNumReactants ('J1')
         """ 
         p = self.model.getReaction(Id)
         if p != None:
@@ -638,13 +669,13 @@ class sbmlModel(object):
         
     def getNumProducts (self, Id):
         """
+        Returns the number of products in the reaction given by the Id argument.
+
         **Parameters**
         
            Id (string): The Id of the reaction in question.
            
-        **Returns**
-        
-           The Id of the specified reaction
+        Example: numProducts = model.getNumProducts ('J1')
         """ 
         p = self.model.getReaction(Id)
         if p != None:
@@ -653,13 +684,13 @@ class sbmlModel(object):
         
     def getRateLaw (self, Id):
         """
+        Returns the expression for the rate laws of the reaction given by the specified Id
+
         **Parameters**
         
            Id (string): The Id of the reaction in question.
-           
-        **Returns**
-        
-           A string representing the kinetic low of the reaction in question.
+  
+        Example: formulaStr = model.getRateLaw ('J1')
         """ 
         p = self.model.getReaction(Id)
         if p != None:
@@ -668,15 +699,15 @@ class sbmlModel(object):
               
     def getReactant (self, reactionId, reactantIndex):
         """
+        Returns the Id of the reactantIndexth reactant in the reaction given by the reactionId
+
         **Parameters**
         
            Id (string): The Id of the reaction in question
            
            reactantIndex (int): The ith reactant in the reaction
-           
-        **Returns**
-        
-           The Id of the reactant
+
+        Example: astr = model.getReactant ('J1', 0)
         """ 
         ra = self.model.getReaction(reactionId)
         sr = ra.getReactant(reactantIndex)
@@ -684,15 +715,15 @@ class sbmlModel(object):
     
     def getProduct (self, reactionId, productIndex):
         """
+        Returns the Id of the productIndexth product in the reaction given by the reactionId
+
         **Parameters**
         
            Id (string): The Id of the reaction in question
            
-           reactantIndex (int): The ith product in the reaction
-           
-        **Returns**
-        
-           The Id of the product
+           productIndex (int): The ith product in the reaction
+
+        Example: astr = model.getProduct ('J1', 0)
         """ 
         ra = self.model.getReaction(reactionId)
         sr = ra.getProduct(productIndex)
@@ -700,6 +731,8 @@ class sbmlModel(object):
     
     def getReactantStoichiometry (self, reactionId, reactantIndex):
         """
+        Returns the stoichiometry for a reactant in a reaction.
+
         **Parameters**
         
            reactionId (string): The Id of the reaction in question
@@ -708,7 +741,9 @@ class sbmlModel(object):
            
         **Returns**
         
-           The value of the reactant stoichiomeetry
+           The value of the reactant stoichiometry
+
+        Example: stInt = model.getReactantStoichiometry ('J1', 0)
         """         
         ra = self.model.getReaction(reactionId)
         sr = ra.getReactant(reactantIndex)
@@ -716,6 +751,8 @@ class sbmlModel(object):
 
     def getProductStoichiometry (self, reactionId, productIndex):
         """
+        Returns the stoichiometry for a product in a reaction.
+
         **Parameters**
         
            reactionId (string): The Id of the reaction in question
@@ -724,7 +761,9 @@ class sbmlModel(object):
            
         **Returns**
         
-           The value of the product stoichiomeetry
+           The value of the product stoichiometry
+
+        Example: stInt = model.getProductStoichiometry ('J1', 0)
         """
         ra = self.model.getReaction(reactionId)
         sr = ra.getProduct(productIndex)
@@ -744,22 +783,28 @@ class sbmlModel(object):
     def getRuleId (self, index):
         """
         Returns the rule Id of the indexth rule
+
+        Example: rule = model.getRuleId (2)
         """         
         return self.model.getRule (index).getId()
 
     def getRuleRightSide (self, rule):
         """
-        Returns the formula on the right-hand side of the rule
-        
-        The rule argument can be an index to the indexth rule or the Id of the rule
+        Returns the formula on the right-hand side of the rule in question.
+
+        The rule can be an index to the indexth rule or the Id of the rule. You can get the Ids by calling getListOfRules()
+
+        Example: formula = model.getRuleRightSide (0)
         """
         return self.model.getRule (rule).getFormula()
 
     def getRuleType (self, rule):
         """
-        Returns a string indicating the type of rule
-        
-        The rule argument can be an index to the indexth rule or the Id of the rule
+        Returns a string indicating the type of rule in question.
+
+        The rule can be an index to the indexth rule or the Id of the rule. You can get the Ids by calling getListOfRules()
+
+        Example: ruleStr = model.getRuleType (0)
         """
         myRule = self.model.getRule (rule)
         t1 = myRule.getTypeCode()
@@ -774,14 +819,35 @@ class sbmlModel(object):
     def getEventId (self, index):
         """
         Returns the Id for the indexth event
+
+        Example: astr = model.getEventId (0)
         """
         return self.model.getEvent (index).getId()
 
+    def getEventString (self, event):
+        """
+        Returns the indexth event as a compelte string.
+
+        The event argument can be an index to the indexth event or the Id of the event  
+
+        Example: print (model.getEventString (0))
+        """
+        myEvent = self.model.getEvent (event)
+        astr = 'at ' + self.getEventTrigger (event) + ' then { '
+        num = myEvent.getNumEventAssignments()
+        astr = astr + self.getEventVariable (event, 0) + ' = ' + self.getEventAssignment (event, 0)
+        for i in range (1, num):
+            astr = astr + '; ' + self.getEventVariable (event, i) + ' = ' + self.getEventAssignment (event, i)
+        astr = astr + ' }'
+        return astr
+        
     def getEventTrigger (self, event):
         """
-        Returns the formula for the event trigger of the event event.
-        
-        The event argument can be an index (int) to the indexth event or the Id of the event
+        Returns the formula as a string for the event trigger of the event event.
+
+        The event argument can be an index to the indexth event or the Id of the event
+
+        Example : astr = model.getEventTrigger (0)
         """
         myEvent = self.model.getEvent(event)
         trig = myEvent.getTrigger()        
@@ -794,16 +860,76 @@ class sbmlModel(object):
         event = self.model.getEvent(index)
         return event.getNumEventAssignments()
 
+    def getEventVariable (self, event, assignmentIndex):
+        """
+        Returns the event variables (i.e the left-hand side) for the assignmentIndexth assignment
+        in the event, given by event,
+
+        The event argument can be an index to the indexth event or the Id of the event
+
+        Example: astr = model.getEventVariable (0, 0)
+        """
+        myEvent = self.model.getEvent(event)
+        eventAss = myEvent.getEventAssignment(assignmentIndex)  
+        return eventAss.getVariable()
+
     def getEventAssignment (self, event, assignmentIndex):
         """
-        Retuns the assignmentIndexth assignemnt in the event event.
-        
-        The event argument can be an index (int) to the indexth event or the Id of the event        
+        Retuns the assignmentIndexth assignment in the event event.
+
+        The event argument can be an index to the indexth event or the Id of the event   
+
+        Example: mathStr = model.getEventAssignment (1, 0)     
         """
         myEvent = self.model.getEvent(event)
         eventAss = myEvent.getEventAssignment(assignmentIndex)                
         m = eventAss.getMath()
         return libsbml.formulaToL3String(m)
+
+    def getFunctionId (self, index):
+        """
+        Retuns the Id of the indexth user function definition
+
+        Example: mathStr = model.getFunctionId (0)     
+        """
+        return self.model.getFunctionDefinition (index).getId()
+
+    def getFunctionBody (self, func):
+        """
+        """ 
+        myFunc = self.model.getFunctionDefinition (func) 
+        return libsbml.formulaToL3String(myFunc.getBody())
+
+    def getNumArgumentsInUserFunction (self, func):
+        """
+        Returns the number of arguments in the given function. The func argument can either be the name
+        of a user function or its index.
+
+        Example: 
+
+          nargs = model.getNumArgumentsInUserFunction ('Hill')
+
+          nargs = model.getNumArgumentsInUserFunction (0)
+        """
+        myFunc = self.model.getFunctionDefinition (func) 
+        return myFunc.getNumArguments()                
+
+    def getListOfArgumentsInUserFunction (self, func):
+        """
+        Returns a list of arguments in the specified user function. The func argument can either be the name
+        of a user function or its index in the list of user fucntions.
+
+        Example: 
+
+          alist = model.getListOfArgumentsInUserFunction ('Hill')
+
+          alist = model.getListOfArgumentsInUserFunction (0)
+        """
+        myFunc = self.model.getFunctionDefinition (func) 
+        alist = []
+        for i in range (myFunc.getNumArguments()):
+            alist.append (libsbml.formulaToL3String(myFunc.getArgument(i)))
+        return alist
 
     # def getReaction(self, rxn_id):
     #     return self.model.getReaction(rxn_id)
@@ -828,7 +954,10 @@ class sbmlModel(object):
 
     def toSBML(self):
         """Returns the model in SBML format as a string.  Also checks model consistency
-       and prints all errors and warnings."""
+       and prints all errors and warnings.
+
+       Example: print (model.toSBML())
+       """
 
         errors = self.document.checkConsistency()
         if (errors > 0):
@@ -1031,7 +1160,6 @@ def writeCodeFromString(sbmlstring):
     """Reads *sbmlstring* as an SBML format model and
     returns a string containing calls to SimpleSBML functions that reproduce
     the model in an sbmlModel object."""
-
 
     reader = libsbml.SBMLReader()
     doc = reader.readSBMLFromString(sbmlstring)

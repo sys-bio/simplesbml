@@ -118,11 +118,19 @@ The output saved to 'example_code.py' will look like this::
 Examples of Interrogating an Existing Model
 ============================================
 
-Verison 1.3.0 has a set of new 'get' methods that allows a user to easily interrogate a model for its contents.::
+Verison 1.3.x has a set of new 'get' methods that allows a user to easily interrogate a model for its contents.::
 
     import simplesbml
     mymodel = loadFromFile ('mymodel.xml')  # Load the model into a string variable
-    model = simplesbml.sbmlModel(mymodel)
+    model = simplesbml.sbmlModel(strSbml=mymodel)
+
+    # Or:
+
+    model = simplesbml.sbmlModel(strFile='mymodel.xml')
+
+    # Or of you're using the Tellurium package:
+
+    model = simplesbml.sbmlModel(strSbml=r.getSBML())    
   
     print ('Num compartmetns = ', s.getNumCompartments())
     print ('Num parameters =', s.getNumParameters())

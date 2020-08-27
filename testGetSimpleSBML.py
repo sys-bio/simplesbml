@@ -9,7 +9,11 @@ import tellurium as te
 import simplesbml
 
 r = te.loada("""
-             
+ 
+    function Hill(S, Vm, K, n)
+      S^n*Vm/(K + S^n);
+    end
+            
     k1 := 3.4
     x' = k1*x
     
@@ -19,78 +23,93 @@ r = te.loada("""
     at time > 10: k2 = 200;
     at S1 > S2: k2 = 200/3, k3 = 1.02
     
-    k2 = 1.2345; k3 = 0.98776;
-    S1 = 10.6; S2 = 0
+    k2 = 1.2345; k3 = 0.976;
+    S1 = 10.6; S2 = 0.234
     S3 = 99.76; x = 0.345
 """)
 
-s = simplesbml.sbmlModel (sbmlStr=r.getSBML())
+model = simplesbml.sbmlModel (sbmlStr=r.getSBML())
+# or you can load from a file:
+# model = simplesbml.sbmlModel (sbmlFile='mymodel.xml')
 
-print ('Num compartments = ', s.getNumCompartments())
-print ('Num parameters =', s.getNumParameters())
-print ('Num species =', s.getNumSpecies())
-print ('Num floating species = ', s.getNumFloatingSpecies())
-print ('Num floating species = ', s.getNumBoundarySpecies())
-print ('Num reactions = ', s.getNumReactions())
-print ('List of compartments: ', s.getListOfCompartments())
-print ('List of ALL species: ', s.getListOfAllSpecies())
-print ('list of floating species = ', s.getListOfFloatingSpecies())
-print ('list of boundary species = ', s.getListOfBoundarySpecies())
-print ('List of reactions = ', s.getListOfReactions())
-print ('List of rules = ', s.getListOfRules())
+print ('Number of compartmentmodel = ', model.getNumCompartments())
+print ('Number of parametermodel =', model.getNumParameters())
+print ('Number of speciemodel =', model.getNumSpecies())
+print ('Number of floating speciemodel = ', model.getNumFloatingSpecies())
+print ('Number of floating speciemodel = ', model.getNumBoundarySpecies())
+print ('Number of reactions = ', model.getNumReactions())
+print ('Number of of function definitions = ', model.getNumFunctionDefinitions())
+print ('List of compartments: ', model.getListOfCompartments())
+print ('List of ALL species: ', model.getListOfAllSpecies())
+print ('list of floating speciemodel = ', model.getListOfFloatingSpecies())
+print ('list of boundary speciemodel = ', model.getListOfBoundarySpecies())
+print ('List of reactionmodel = ', model.getListOfReactions())
+print ('List of rulemodel = ', model.getListOfRules())
+#print ('List of function definitions = ', model.getListOfFuncion)
 
 print ('Compartment values:')
-p = s.getListOfCompartments()
+p = model.getListOfCompartments()
 for v in p:
-    print (v, ': ', s.getCompartmentVolume (v))
+    print (v, ': ', model.getCompartmentVolume (v))
     
 print ('Parameter values:')
-p = s.getListOfParameters()
+p = model.getListOfParameters()
 for v in p:
-    print (v, ': ', s.getParameterValue (v))
+    print (v, ': ', model.getParameterValue (v))
     
 print ('Species values:')
-p = s.getListOfAllSpecies()
+p = model.getListOfAllSpecies()
 for v in p:
-    print (v, ': ', s.getSpeciesInitialConcentration (v))
+    if model.isSpeciesValueSet (v):
+       print (v, ': ', model.getSpeciesInitialConcentration (v))
+    else:
+       print (v, ': species value not set') 
  
 print ('Rate laws:')
-reactions = s.getListOfReactions()
+reactions = model.getListOfReactions()
 for v in reactions:
-    print (v, ': ', s.getRateLaw (v))
+    print (v, ': ', model.getRateLaw (v))
     
 print ('-------------------------------------------------')
 print ('Reaction Details:')
-rs = s.getListOfReactions()
+rs = model.getListOfReactions()
 for rId in rs:
     print ('Reaction:', rId)
-    print ('Number of reactants: ', s.getNumReactants (rId))
-    print ('Number of products: ', s.getNumProducts (rId))
-    for i in range (s.getNumReactants(rId)):
-        print ('Name and stoichiometry of Reactant:', s.getReactant(rId, i), s.getReactantStoichiometry (rId, i))
-    for i in range (s.getNumProducts(rId)):
-        print ('Name and stoichiometry of Product:', s.getProduct(rId, i), s.getProductStoichiometry (rId, i))
+    print ('Number of reactants: ', model.getNumReactants (rId))
+    print ('Number of products: ', model.getNumProducts (rId))
+    for i in range (model.getNumReactants(rId)):
+        print ('Name and stoichiometry of Reactant:', model.getReactant(rId, i), model.getReactantStoichiometry (rId, i))
+    for i in range (model.getNumProducts(rId)):
+        print ('Name and stoichiometry of Product:', model.getProduct(rId, i), model.getProductStoichiometry (rId, i))
     print ('-------------------------------') 
     
-if s.getNumRules() > 0:
+if model.getNumRules() > 0:
     #print ('-------------------------------------------------')
     print ('Rule Details:')
-    for i in range (s.getNumRules()):
-        ruleType = s.getRuleType (i)  # note argument could also be a Id string
-        Id = s.getRuleId(i)
-        print ('Rule: ', Id, '(' + ruleType + '), Right-hand side = ', s.getRuleRightSide(i))
+    for i in range (model.getNumRules()):
+        ruleType = model.getRuleType (i)  # note argument could also be a Id string
+        Id = model.getRuleId(i)
+        print ('Rule: ', Id, '(' + ruleType + ') = ', model.getRuleRightSide(i))
            
-if s.getNumEvents() > 0:
+if model.getNumEvents() > 0:
     print ('-------------------------------------------------')
     print ('Event Details:')
-    for i in range (s.getNumEvents()):
-        Id = s.getEventId(i) # note argument could also be a Id string
-        numAssignments = s.getNumEventAssignments(i)
+    for i in range (model.getNumEvents()):
+        Id = model.getEventId(i) # note argument could also be a Id string
+        numAssignments = model.getNumEventAssignments(i)
         print ('Event: ', Id, ', Number of assignments in the event = ', numAssignments)
-        print ('Event trigger: ', s.getEventTrigger (i))
-        for j in range (numAssignments):
-            assignment = s.getEventAssignment (i, j)
-            print ("Assignment:", str (j) + ', Formula =', assignment)
-        if i != s.getNumEvents() - 1:
+        print ('Event trigger: ', model.getEventTrigger (i))
+        print (model.getEventString (i))
+        if i != model.getNumEvents() - 1:
            print ('--------------------------------')
-    
+
+if model.getNumFunctionDefinitions() > 0:
+    print ('-------------------------------------------------')
+    print ('User Function Details:')
+    for i in range (model.getNumFunctionDefinitions()):
+        Id = model.getFunctionId(i) # note argument could also be an Id string
+        print ('Function: ', Id)
+        print ('Arguments: ', model.getListOfArgumentsInUserFunction (i))
+        print ('Function body: ', model.getFunctionBody(i))
+        print ('--------------------------------')
+           
