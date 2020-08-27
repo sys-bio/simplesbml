@@ -8,6 +8,10 @@ libSBML documentation: http://sbml.org/Software/libSBML/docs/python-api/index.ht
 
 SBML main page: http://sbml.org/Main_Page
 
+The current version is 1.3.1. Compared to 1.2.x series, this added get functions to interrogate an existing SBML models.
+
+The difference between 1.3.0 and 1.3.1 is that the later includes get supoprt for events and rules.
+
 # How to install SimpleSBML
 
 SimpleSBML can be installed via pip:
