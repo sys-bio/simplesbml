@@ -740,6 +740,66 @@ class sbmlModel(object):
             alist.append (p.getId())             
         return alist
     
+    def getRuleId (self, index):
+        """
+        Returns the rule Id of the indexth rule
+        """         
+        return self.model.getRule (index).getId()
+
+    def getRuleRightSide (self, rule):
+        """
+        Returns the formula on the right-hand side of the rule rule
+        rule can be an index to indexth rule or the Id of the rule
+        """
+        return self.model.getRule (rule).getFormula()
+
+    def getRuleType (self, rule):
+        """
+        Returns a string indicating the type of rule rule
+        rule can be an index to indexth rule or the Id of the rule
+        """
+        myRule = self.model.getRule (rule)
+        t1 = myRule.getTypeCode()
+        if t1 == libsbml.SBML_RATE_RULE:
+           return 'ODE (or rate) rule' 
+        if t1 == libsbml.SBML_ASSIGNMENT_RULE:
+           return 'Assignment rule' 
+        if t1 == libsbml.SBML_ALGEBRAIC_RULE:
+           return 'Algebraic rule' 
+        raise Exception ('Unknown rule in SBML model')
+
+    def getEventId (self, index):
+        """
+        Returns the Id for the indexth event
+        """
+        return self.model.getEvent (index).getId()
+
+    def getEventTrigger (self, event):
+        """
+        Returns the formula for the event trigger of the event event.
+        eventRef can be an index to indexth event or the Id of the event
+        """
+        myEvent = self.model.getEvent(event)
+        trig = myEvent.getTrigger()        
+        return libsbml.formulaToL3String (trig.getMath())
+
+    def getNumEventAssignments (self, index):
+        """
+        Returns the number of assignemnts in the indexth rule.
+        """
+        event = self.model.getEvent(index)
+        return event.getNumEventAssignments()
+
+    def getEventAssignment (self, event, assignmentIndex):
+        """
+        Retuns the assignmentIndexth assignemnt in the event event.
+        eventRef can be an index to indexth event or the Id of the event        
+        """
+        myEvent = self.model.getEvent(event)
+        eventAss = myEvent.getEventAssignment(assignmentIndex)                
+        m = eventAss.getMath()
+        return libsbml.formulaToL3String(m)
+
     # def getReaction(self, rxn_id):
     #     return self.model.getReaction(rxn_id)
 
