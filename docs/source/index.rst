@@ -18,7 +18,7 @@ To see the documentation for libSBML, go to
 http://sbml.org/Software/libSBML/docs/python-api/index.html
 .
 
-To read more about SBML (Synthetic Biology Markup Language), go to
+To read more about SBML (Systems Biology Markup Language), go to
 http://sbml.org/Main_Page
 .
 
@@ -114,6 +114,28 @@ The output saved to 'example_code.py' will look like this::
     model.addSpecies(species_id='ES', amt=0.0, comp='comp')
     model.addReaction(reactants=['E', 'S'], products=['ES'], expression='comp * (kon * E * S - koff * ES)', local_params={'koff': 0.2, 'kon': 1000000.0}, rxn_id='veq')
     model.addReaction(reactants=['ES'], products=['E', 'P'], expression='comp * kcat * ES', local_params={'kcat': 0.1}, rxn_id='vcat')
+
+Examples of Interrogating an Existing Model
+============================================
+
+Verison 1.3.0 has a set of new 'get' methods that allows a user to easily interrogate a model for its contents.::
+
+    import simplesbml
+    mymodel = loadFromFile ('mymodel.xml')  # Load the model into a string variable
+    model = simplesbml.sbmlModel(mymodel)
+  
+    print ('Num compartmetns = ', s.getNumCompartments())
+    print ('Num parameters =', s.getNumParameters())
+    print ('Num species =', s.getNumSpecies())
+    print ('Num floating species = ', s.getNumFloatingSpecies())
+    print ('Num floating species = ', s.getNumBoundarySpecies())
+    print ('Num reactions = ', s.getNumReactions())
+    print (s.getListOfCompartments())
+    print (s.getListOfAllSpecies())
+    print ('list of floating species = ', s.getListOfFloatingSpecies())
+    print ('list of boundary species = ', s.getListOfBoundarySpecies())
+    print ('List of reactions = ', s.getListOfReactions())
+    print ('List of rules = ', s.getListOfRules())
 
 -------------------
 Classes and Methods

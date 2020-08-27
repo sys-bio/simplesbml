@@ -57,8 +57,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'SimpleSBML'
-copyright = '2015, Caroline Cannistra'
-author = 'Caroline Cannistra'
+copyright = '2015, 2020, Caroline Cannistra'
+author = 'Caroline Cannistra, Kyle medley, Herbert Sauro'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
