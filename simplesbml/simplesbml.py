@@ -3,7 +3,6 @@ import warnings
 # try to import tesbml or libsbml
 # if both of these fail, libsbml cannot be imported - cannot continue
 try:
-
     import tesbml as libsbml   
 except ImportError:
     import libsbml
@@ -12,7 +11,9 @@ from math import isnan
 from re import sub
 import os
 
+# --------------------------------
 # Version info is in __init__.py
+# --------------------------------
 
 def _isSBMLModel(obj):
   """
@@ -748,15 +749,17 @@ class sbmlModel(object):
 
     def getRuleRightSide (self, rule):
         """
-        Returns the formula on the right-hand side of the rule rule
-        rule can be an index to indexth rule or the Id of the rule
+        Returns the formula on the right-hand side of the rule
+        
+        The rule argument can be an index to the indexth rule or the Id of the rule
         """
         return self.model.getRule (rule).getFormula()
 
     def getRuleType (self, rule):
         """
-        Returns a string indicating the type of rule rule
-        rule can be an index to indexth rule or the Id of the rule
+        Returns a string indicating the type of rule
+        
+        The rule argument can be an index to the indexth rule or the Id of the rule
         """
         myRule = self.model.getRule (rule)
         t1 = myRule.getTypeCode()
@@ -777,7 +780,8 @@ class sbmlModel(object):
     def getEventTrigger (self, event):
         """
         Returns the formula for the event trigger of the event event.
-        eventRef can be an index to indexth event or the Id of the event
+        
+        The event argument can be an index (int) to the indexth event or the Id of the event
         """
         myEvent = self.model.getEvent(event)
         trig = myEvent.getTrigger()        
@@ -785,7 +789,7 @@ class sbmlModel(object):
 
     def getNumEventAssignments (self, index):
         """
-        Returns the number of assignemnts in the indexth rule.
+        Returns the number of assignments in the indexth rule.
         """
         event = self.model.getEvent(index)
         return event.getNumEventAssignments()
@@ -793,7 +797,8 @@ class sbmlModel(object):
     def getEventAssignment (self, event, assignmentIndex):
         """
         Retuns the assignmentIndexth assignemnt in the event event.
-        eventRef can be an index to indexth event or the Id of the event        
+        
+        The event argument can be an index (int) to the indexth event or the Id of the event        
         """
         myEvent = self.model.getEvent(event)
         eventAss = myEvent.getEventAssignment(assignmentIndex)                

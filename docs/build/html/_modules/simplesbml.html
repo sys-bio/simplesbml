@@ -153,7 +153,6 @@
 <span class="c1"># try to import tesbml or libsbml</span>
 <span class="c1"># if both of these fail, libsbml cannot be imported - cannot continue</span>
 <span class="k">try</span><span class="p">:</span>
-
     <span class="kn">import</span> <span class="nn">tesbml</span> <span class="k">as</span> <span class="nn">libsbml</span>   
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">libsbml</span>
@@ -162,7 +161,9 @@
 <span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">sub</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
+<span class="c1"># --------------------------------</span>
 <span class="c1"># Version info is in __init__.py</span>
+<span class="c1"># --------------------------------</span>
 
 <span class="k">def</span> <span class="nf">_isSBMLModel</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;</span>
@@ -890,6 +891,70 @@
             <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
         <span class="k">return</span> <span class="n">alist</span></div>
     
+<div class="viewcode-block" id="sbmlModel.getRuleId"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getRuleId">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the rule Id of the indexth rule</span>
+<span class="sd">        &quot;&quot;&quot;</span>         
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="sbmlModel.getRuleRightSide"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getRuleRightSide">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleRightSide</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the formula on the right-hand side of the rule</span>
+<span class="sd">        </span>
+<span class="sd">        The rule argument can be an index to the indexth rule or the Id of the rule</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span><span class="o">.</span><span class="n">getFormula</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="sbmlModel.getRuleType"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getRuleType">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleType</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string indicating the type of rule</span>
+<span class="sd">        </span>
+<span class="sd">        The rule argument can be an index to the indexth rule or the Id of the rule</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myRule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">myRule</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_RATE_RULE</span><span class="p">:</span>
+           <span class="k">return</span> <span class="s1">&#39;ODE (or rate) rule&#39;</span> 
+        <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ASSIGNMENT_RULE</span><span class="p">:</span>
+           <span class="k">return</span> <span class="s1">&#39;Assignment rule&#39;</span> 
+        <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ALGEBRAIC_RULE</span><span class="p">:</span>
+           <span class="k">return</span> <span class="s1">&#39;Algebraic rule&#39;</span> 
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Unknown rule in SBML model&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="sbmlModel.getEventId"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventId">[docs]</a>    <span class="k">def</span> <span class="nf">getEventId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Id for the indexth event</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getEvent</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="sbmlModel.getEventTrigger"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventTrigger">[docs]</a>    <span class="k">def</span> <span class="nf">getEventTrigger</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the formula for the event trigger of the event event.</span>
+<span class="sd">        </span>
+<span class="sd">        The event argument can be an index (int) to the indexth event or the Id of the event</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="n">trig</span> <span class="o">=</span> <span class="n">myEvent</span><span class="o">.</span><span class="n">getTrigger</span><span class="p">()</span>        
+        <span class="k">return</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span> <span class="p">(</span><span class="n">trig</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="sbmlModel.getNumEventAssignments"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumEventAssignments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumEventAssignments</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of assignments in the indexth rule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getEvent</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">event</span><span class="o">.</span><span class="n">getNumEventAssignments</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="sbmlModel.getEventAssignment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">getEventAssignment</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">assignmentIndex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retuns the assignmentIndexth assignemnt in the event event.</span>
+<span class="sd">        </span>
+<span class="sd">        The event argument can be an index (int) to the indexth event or the Id of the event        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myEvent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="n">eventAss</span> <span class="o">=</span> <span class="n">myEvent</span><span class="o">.</span><span class="n">getEventAssignment</span><span class="p">(</span><span class="n">assignmentIndex</span><span class="p">)</span>                
+        <span class="n">m</span> <span class="o">=</span> <span class="n">eventAss</span><span class="o">.</span><span class="n">getMath</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
+
     <span class="c1"># def getReaction(self, rxn_id):</span>
     <span class="c1">#     return self.model.getReaction(rxn_id)</span>
 
