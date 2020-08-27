@@ -12,7 +12,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='simplesbml',
-      version='1.3.1',
+      version='1.3.3',
       description='A simplified interface for constructing and accessing SBML docs.',
       author='Caroline Cannistra, Kyle Medley, Hebrert Sauro',
       author_email='tellurium-discuss@googlegroups.com',
