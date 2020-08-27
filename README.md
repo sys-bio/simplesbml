@@ -14,6 +14,8 @@ The current version is 1.3.1. Compared to 1.2.x series, this adds 'get' function
 
 The difference between 1.3.0 and 1.3.1 is that the later includes get supoprt for events and rules.
 
+1.3.2 has enhanced documentation, support for user functions, and som e bug fixes
+
 # How to install SimpleSBML
 
 SimpleSBML can be installed via pip:
