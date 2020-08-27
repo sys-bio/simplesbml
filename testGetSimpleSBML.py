@@ -20,7 +20,7 @@ r = te.loada("""
     S3 = 99.76
 """)
 
-s = simplesbml.sbmlModel (modelReference=r.getSBML())
+s = simplesbml.sbmlModel (sbmlStr=r.getSBML())
 
 print ('Num compartmetns = ', s.getNumCompartments())
 print ('Num parameters =', s.getNumParameters())
