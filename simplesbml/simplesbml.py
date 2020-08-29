@@ -424,6 +424,12 @@ class sbmlModel(object):
         This is not something you need to care about unless you need direct access to libsbml"""
         return self.model
 
+    def getModelId (self):
+        """
+        Returns the SBML ID given to the model. 
+        """
+        return self.model.getModelId()
+    
     def getNumCompartments (self):
         """
         Returns the number of compartments in the current model.
@@ -769,6 +775,24 @@ class sbmlModel(object):
         sr = ra.getProduct(productIndex)
         return sr.getStoichiometry ()
         
+    def getNumModifiers (self, reactionId):
+        """
+        Returns the number of modifiers in a given reaction.
+        """
+        return self.model.getReaction (reactionId).getNumModifiers()
+
+    def getListOfModifiers (self, reactionId):
+        """
+        Returns the number of modifiers in a given reaction.
+        """
+        alist = []
+        reaction = self.model.getReaction (reactionId)
+        if reaction != None:
+           for i in range (reaction.getNumModifiers()):
+               alist.append (reaction.getModifer (0))
+            return alist
+        raise Exception ('No such reaction can be found:', reactionId)
+ 
     def getListOfRules(self):
         """
         Returns a list of Ids for the rules
