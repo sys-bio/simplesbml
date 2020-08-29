@@ -783,9 +783,9 @@ class sbmlModel(object):
 
     def getListOfModifiers (self, reactionId):
         """
-        Returns the number of modifiers in a given reaction.
+        Returns the list of modifiers in a given reaction.
         """
-        alist = []
+        alist
         reaction = self.model.getReaction (reactionId)
         if reaction != None:
            for i in range (reaction.getNumModifiers()):
