@@ -3,7 +3,6 @@ import warnings
 # try to import tesbml or libsbml
 # if both of these fail, libsbml cannot be imported - cannot continue
 try:
-
     import tesbml as libsbml   
 except ImportError:
     import libsbml
@@ -781,17 +780,18 @@ class sbmlModel(object):
         """
         return self.model.getReaction (reactionId).getNumModifiers()
 
-    def getListOfModifiers (self, reactionId):
+   def getListOfModifiers (self, reactionId):
         """
         Returns the list of modifiers in a given reaction.
         """
-        alist
+        alist = []
         reaction = self.model.getReaction (reactionId)
         if reaction != None:
            for i in range (reaction.getNumModifiers()):
                alist.append (reaction.getModifer (0))
-            return alist
-        raise Exception ('No such reaction can be found:', reactionId)
+           return alist
+        else:
+           raise Exception ('No such reaction can be found:', reactionId)
  
     def getListOfRules(self):
         """
