@@ -3,6 +3,7 @@ import warnings
 # try to import tesbml or libsbml
 # if both of these fail, libsbml cannot be imported - cannot continue
 try:
+
     import tesbml as libsbml   
 except ImportError:
     import libsbml
@@ -425,9 +426,9 @@ class sbmlModel(object):
 
     def getModelId (self):
         """
-        Returns the SBML ID given to the model. 
+        Returns the SBML Id given to the model. 
         """
-        return self.model.getModelId()
+        return self.model.getModel().getId()
     
     def getNumCompartments (self):
         """
@@ -589,6 +590,33 @@ class sbmlModel(object):
                alist.append (sp.getId())         
         return alist  
     
+    def isFloatingSpecies (self, Id):
+        """
+        Returns true if the Id is a floating species
+        """
+        sp = self.model.getSpecies(Id)
+        if sp != None:
+           if sp.isSetBoundaryCondition():
+              return False
+           else:
+              return True
+        else:
+           raise Exception ('Id in isFloatingSpecies is not a species Id')  
+
+    def isBoundarySpecies (self, Id):
+        """
+        Returns true if the Id is a boundary species
+        """
+        sp = self.model.getSpecies(Id)
+        if sp != None:
+           if sp.isSetBoundaryCondition():
+              return True
+           else:
+              return False
+        else:
+           raise Exception ('Id in isFloatingSpecies is not a species Id')  
+
+
     def getNumFloatingSpecies (self):
         """
         Returns the number of floating species.
@@ -780,7 +808,7 @@ class sbmlModel(object):
         """
         return self.model.getReaction (reactionId).getNumModifiers()
 
-   def getListOfModifiers (self, reactionId):
+    def getListOfModifiers (self, reactionId):
         """
         Returns the list of modifiers in a given reaction.
         """
