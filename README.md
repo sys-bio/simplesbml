@@ -14,7 +14,9 @@ The current version is 1.3.1. Compared to 1.2.x series, this adds 'get' function
 
 The difference between 1.3.0 and 1.3.1 is that the later includes get supoprt for events and rules.
 
-1.3.2 has enhanced documentation, support for user functions, and som e bug fixes
+1.3.2 has enhanced documentation, support for user functions, and some bug fixes
+
+1.3.3 adds new help functions for checking amounts and concentrations. Also the class name has been capitalized to match usesal conventions in Python, so the class name is now SbmlModel.
 
 # How to install SimpleSBML
 
