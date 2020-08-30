@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>simplesbml &mdash; SimpleSBML 1.2.2 documentation</title>
+  <title>simplesbml &mdash; SimpleSBML 1.3.3 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.2.2
+                1.3.3
               </div>
             
           
@@ -178,16 +178,16 @@
   <span class="k">if</span> <span class="p">(</span><span class="n">document</span><span class="o">.</span><span class="n">getNumErrors</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Errors in SBML document&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="sbmlModel"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel">[docs]</a><span class="k">class</span> <span class="nc">sbmlModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel">[docs]</a><span class="k">class</span> <span class="nc">SbmlModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="sd">&quot;&quot;&quot;   </span>
-<span class="sd">    sbmlModel is used to construct simple models using libSBML methods and</span>
+<span class="sd">    SbmlModel is used to construct simple models using libSBML methods and</span>
 <span class="sd">    print out the model in SBML format.  A user can add species, parameters,</span>
 <span class="sd">    reactions, events, assignment rules, rate rules, and initial assignments</span>
 <span class="sd">    to a model.  Then, the user can view the model in SBML format by printing</span>
 <span class="sd">    the string representation of the class.</span>
 
-<span class="sd">    sbmlModel contains two attributes: *document*, an</span>
+<span class="sd">    SbmlModel contains two attributes: *document*, an</span>
 <span class="sd">    `SBMLDocument &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_s_b_m_l_document.html&gt;`_</span>
 <span class="sd">    object, an</span>
 <span class="sd">    *model*, the</span>
@@ -197,7 +197,7 @@
 <span class="sd">    You can also pass a SBML string and use simlesbml to obtain information about the model</span>
 <span class="sd">    using the get methods, e.g</span>
 <span class="sd">       </span>
-<span class="sd">    model = simplesbml.sbmlModel (sbmlStr=mySBMLString)</span>
+<span class="sd">    model = simplesbml.SbmlModel (sbmlStr=mySBMLString)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_units</span><span class="o">=</span><span class="s1">&#39;second&#39;</span><span class="p">,</span> <span class="n">extent_units</span><span class="o">=</span><span class="s1">&#39;mole&#39;</span><span class="p">,</span> \
@@ -263,11 +263,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span>
 
-<div class="viewcode-block" id="sbmlModel.addCompartment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addCompartment">[docs]</a>    <span class="k">def</span> <span class="nf">addCompartment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">comp_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.addCompartment"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addCompartment">[docs]</a>    <span class="k">def</span> <span class="nf">addCompartment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">comp_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds a `Compartment &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_compartment.html&gt;`_</span>
 <span class="sd">        of volume *vol* litres to the model.  The default volume is 1 litre. If the user does</span>
 <span class="sd">        not specify *comp_id*, the id is set to &#39;c&lt;n&gt;&#39; where the new compartment</span>
-<span class="sd">        is the nth compartment added to the model. All sbmlModel objects are</span>
+<span class="sd">        is the nth compartment added to the model. All SbmlModel objects are</span>
 <span class="sd">        initialized with a default compartment &#39;c1&#39;.&quot;&quot;&quot;</span>
 
         <span class="n">c1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">createCompartment</span><span class="p">()</span>
@@ -282,7 +282,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">(</span><span class="n">c1</span><span class="o">.</span><span class="n">setUnits</span><span class="p">(</span><span class="s1">&#39;litre&#39;</span><span class="p">),</span>               <span class="s1">&#39;set compartment size units&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">c1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addSpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">addSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_id</span><span class="p">,</span> <span class="n">amt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;c1&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.addSpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">addSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_id</span><span class="p">,</span> <span class="n">amt</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="s1">&#39;c1&#39;</span><span class="p">):</span>
         
         <span class="sd">&quot;&quot;&quot;Adds a `Species &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_species.html&gt;`_</span>
 <span class="sd">        to the model.  If *species_id* starts</span>
@@ -314,7 +314,7 @@
                 <span class="s1">&#39;set &quot;hasOnlySubstanceUnits&quot; on s1&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">s1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addParameter"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addParameter">[docs]</a>    <span class="k">def</span> <span class="nf">addParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_id</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;per_second&#39;</span><span class="p">):</span>      
+<div class="viewcode-block" id="SbmlModel.addParameter"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addParameter">[docs]</a>    <span class="k">def</span> <span class="nf">addParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_id</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;per_second&#39;</span><span class="p">):</span>      
         <span class="sd">&quot;&quot;&quot;Adds a `Parameter &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_parameter.html&gt;`_</span>
 <span class="sd">        to the model.  *val* is the value of the parameter, and</span>
 <span class="sd">        *param_id* is the parameter id.  If units are not specified by the user,</span>
@@ -328,7 +328,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">setUnits</span><span class="p">(</span><span class="n">units</span><span class="p">),</span> <span class="s1">&#39;set parameter k units&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">k</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addReaction"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addReaction">[docs]</a>    <span class="k">def</span> <span class="nf">addReaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="n">local_params</span><span class="o">=</span><span class="p">{},</span> <span class="n">rxn_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>      
+<div class="viewcode-block" id="SbmlModel.addReaction"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addReaction">[docs]</a>    <span class="k">def</span> <span class="nf">addReaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactants</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="n">local_params</span><span class="o">=</span><span class="p">{},</span> <span class="n">rxn_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>      
         <span class="sd">&quot;&quot;&quot;Adds a `Reaction &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_reaction.html&gt;`_</span>
 <span class="sd">        to the model.</span>
 
@@ -420,7 +420,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="n">val</span><span class="p">),</span>   <span class="s1">&#39;set value of local parameter&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addEvent"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addEvent">[docs]</a>    <span class="k">def</span> <span class="nf">addEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">assignments</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
+<div class="viewcode-block" id="SbmlModel.addEvent"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addEvent">[docs]</a>    <span class="k">def</span> <span class="nf">addEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">,</span> <span class="n">assignments</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> \
                  <span class="n">initial_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">event_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>           
         <span class="sd">&quot;&quot;&quot;Adds an `Event &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_event.html&gt;`_</span>
 <span class="sd">        to the model.</span>
@@ -490,7 +490,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">(</span><span class="n">pri</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">pri_ast</span><span class="p">),</span> <span class="s1">&#39;add priority to event&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">e1</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addAssignmentRule"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addAssignmentRule">[docs]</a>    <span class="k">def</span> <span class="nf">addAssignmentRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.addAssignmentRule"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addAssignmentRule">[docs]</a>    <span class="k">def</span> <span class="nf">addAssignmentRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
         
         <span class="sd">&quot;&quot;&quot;Adds an `AssignmentRule &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_assignment_rule.html&gt;`_</span>
 <span class="sd">        to the model.  An assignment rule is an equation</span>
@@ -505,7 +505,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span> <span class="s1">&#39;set assignment rule equation&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addRateRule"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addRateRule">[docs]</a>    <span class="k">def</span> <span class="nf">addRateRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.addRateRule"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addRateRule">[docs]</a>    <span class="k">def</span> <span class="nf">addRateRule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
  
         <span class="sd">&quot;&quot;&quot;Adds a `RateRule &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_rate_rule.html&gt;`_</span>
 <span class="sd">        to the model.  A rate rule is similar to an assignment</span>
@@ -521,7 +521,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">setMath</span><span class="p">(</span><span class="n">math_ast</span><span class="p">),</span> <span class="s1">&#39;set rate rule equation&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span></div>
 
-<div class="viewcode-block" id="sbmlModel.addInitialAssignment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.addInitialAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">addInitialAssignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.addInitialAssignment"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.addInitialAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">addInitialAssignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">math</span><span class="p">):</span>
         
         <span class="sd">&quot;&quot;&quot;Adds an `InitialAssignment &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_initial_assignment.html&gt;`_</span>
 <span class="sd">        to the model.  If the</span>
@@ -557,7 +557,7 @@
         <span class="n">isSet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">setLevelAndVersion</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">(</span><span class="n">isSet</span><span class="p">,</span> <span class="s1">&#39;convert to level &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; version &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
 
-<div class="viewcode-block" id="sbmlModel.getDocument"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getDocument">[docs]</a>    <span class="k">def</span> <span class="nf">getDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getDocument"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getDocument">[docs]</a>    <span class="k">def</span> <span class="nf">getDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         
         <span class="sd">&quot;&quot;&quot;Returns the</span>
 <span class="sd">        `SBMLDocument &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_s_b_m_l_document.html&gt;`_</span>
@@ -566,7 +566,7 @@
 <span class="sd">        This is not something you need to care about unless you need direct access to libsbml&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getModel"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getModel">[docs]</a>    <span class="k">def</span> <span class="nf">getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getModel"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getModel">[docs]</a>    <span class="k">def</span> <span class="nf">getModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the</span>
 <span class="sd">        `Model &lt;http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_model.html&gt;`_</span>
 <span class="sd">        object of the sbmlModel.</span>
@@ -574,49 +574,55 @@
 <span class="sd">        This is not something you need to care about unless you need direct access to libsbml&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getNumCompartments"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumCompartments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumCompartments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getModelId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getModelId">[docs]</a>    <span class="k">def</span> <span class="nf">getModelId</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the SBML Id given to the model. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getModel</span><span class="p">()</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="SbmlModel.getNumCompartments"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumCompartments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumCompartments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of compartments in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">()</span>   </div>
        
-<div class="viewcode-block" id="sbmlModel.getNumSpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getNumSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumSpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getNumSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of all species in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumSpecies</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getNumParameters"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumParameters">[docs]</a>    <span class="k">def</span> <span class="nf">getNumParameters</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumParameters"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumParameters">[docs]</a>    <span class="k">def</span> <span class="nf">getNumParameters</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of global parameters in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumParameters</span><span class="p">()</span></div>
     
-<div class="viewcode-block" id="sbmlModel.getNumReactions"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumReactions">[docs]</a>    <span class="k">def</span> <span class="nf">getNumReactions</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumReactions"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumReactions">[docs]</a>    <span class="k">def</span> <span class="nf">getNumReactions</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of reactions in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumReactions</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getNumEvents"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumEvents">[docs]</a>    <span class="k">def</span> <span class="nf">getNumEvents</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumEvents"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumEvents">[docs]</a>    <span class="k">def</span> <span class="nf">getNumEvents</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of events in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumEvents</span><span class="p">()</span>    </div>
 
-<div class="viewcode-block" id="sbmlModel.getNumRules"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumRules">[docs]</a>    <span class="k">def</span> <span class="nf">getNumRules</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumRules"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumRules">[docs]</a>    <span class="k">def</span> <span class="nf">getNumRules</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of rules in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumRules</span><span class="p">()</span>  </div>
 
-<div class="viewcode-block" id="sbmlModel.getNumFunctionDefinitions"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumFunctionDefinitions">[docs]</a>    <span class="k">def</span> <span class="nf">getNumFunctionDefinitions</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">getNumFunctionDefinitions</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of function definitions in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumFunctionDefinitions</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumFunctionDefinitions</span><span class="p">()</span>
     
-<div class="viewcode-block" id="sbmlModel.getNumInitialAssignments"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumInitialAssignments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumInitialAssignments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumInitialAssignments"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumInitialAssignments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumInitialAssignments</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of initial assignments in the current model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>        
@@ -625,7 +631,7 @@
     <span class="c1">#def getSpecies(self, species_id):      </span>
     <span class="c1">#    return self.model.getSpecies(species_id)</span>
 
-<div class="viewcode-block" id="sbmlModel.getListOfCompartments"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfCompartments">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfCompartments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfCompartments"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfCompartments">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfCompartments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of compartment Ids</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -636,7 +642,7 @@
            <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">alist</span></div>
     
-<div class="viewcode-block" id="sbmlModel.getCompartmentVolume"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getCompartmentVolume">[docs]</a>    <span class="k">def</span> <span class="nf">getCompartmentVolume</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getCompartmentVolume"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getCompartmentVolume">[docs]</a>    <span class="k">def</span> <span class="nf">getCompartmentVolume</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        **Parameters**</span>
 <span class="sd">        </span>
@@ -649,10 +655,10 @@
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getCompartment</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span>
-        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Compartment does not exist&#39;</span><span class="p">)</span>       </div>
-     
+        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Compartment does not exist&#39;</span><span class="p">)</span>         </div>
         
-<div class="viewcode-block" id="sbmlModel.getListOfAllSpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfAllSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfAllSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># --------------------------------------------------------------</span>
+<div class="viewcode-block" id="SbmlModel.getListOfAllSpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfAllSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfAllSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of **ALL** species Ids in the model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -663,7 +669,29 @@
            <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>         
         <span class="k">return</span> <span class="n">alist</span></div>
     
-<div class="viewcode-block" id="sbmlModel.isSpeciesValueSet"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.isSpeciesValueSet">[docs]</a>    <span class="k">def</span> <span class="nf">isSpeciesValueSet</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNthFloatingSpeciesId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNthFloatingSpeciesId">[docs]</a>    <span class="k">def</span> <span class="nf">getNthFloatingSpeciesId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Id of the nth floating speces</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfFloatingSpecies</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SbmlModel.getNthBoundarySpeciesId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNthBoundarySpeciesId">[docs]</a>    <span class="k">def</span> <span class="nf">getNthBoundarySpeciesId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Id of the nth boundary speces</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfBoundarySpecies</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SbmlModel.getCompartmentIdSpeciesIsIn"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getCompartmentIdSpeciesIsIn">[docs]</a>    <span class="k">def</span> <span class="nf">getCompartmentIdSpeciesIsIn</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speciesId</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the compartment Id that the species givenin th argument is in.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">speciesId</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">getCompartment</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Species Id:&#39;</span> <span class="o">+</span> <span class="n">speciesId</span> <span class="o">+</span> <span class="s1">&#39; does not exist in the model&#39;</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="SbmlModel.isSpeciesValueSet"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isSpeciesValueSet">[docs]</a>    <span class="k">def</span> <span class="nf">isSpeciesValueSet</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns true if the species has been set a value (concentration or amount).</span>
 
@@ -677,7 +705,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getSpeciesInitialConcentration"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getSpeciesInitialConcentration">[docs]</a>    <span class="k">def</span> <span class="nf">getSpeciesInitialConcentration</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getSpeciesInitialConcentration"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getSpeciesInitialConcentration">[docs]</a>    <span class="k">def</span> <span class="nf">getSpeciesInitialConcentration</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the initial values for the concentration of a species with given Id</span>
 
@@ -694,7 +722,7 @@
            <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Species has not been initialized with a concentration&#39;</span><span class="p">)</span></div>
         
 
-<div class="viewcode-block" id="sbmlModel.getSpeciesInitialAmount"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getSpeciesInitialAmount">[docs]</a>    <span class="k">def</span> <span class="nf">getSpeciesInitialAmount</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getSpeciesInitialAmount"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getSpeciesInitialAmount">[docs]</a>    <span class="k">def</span> <span class="nf">getSpeciesInitialAmount</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the initial values for the amount of a species with given Id</span>
 
@@ -710,7 +738,7 @@
         <span class="k">else</span><span class="p">:</span>
            <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Species has not been initialized with an amount&#39;</span><span class="p">)</span> </div>
          
-<div class="viewcode-block" id="sbmlModel.getListOfFloatingSpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfFloatingSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfFloatingSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfFloatingSpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfFloatingSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfFloatingSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all floating species Ids.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -722,7 +750,7 @@
                <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>         
         <span class="k">return</span> <span class="n">alist</span>    </div>
 
-<div class="viewcode-block" id="sbmlModel.getListOfBoundarySpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfBoundarySpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfBoundarySpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfBoundarySpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfBoundarySpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfBoundarySpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all boundary species Ids.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -734,13 +762,66 @@
                <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>         
         <span class="k">return</span> <span class="n">alist</span>  </div>
     
-<div class="viewcode-block" id="sbmlModel.getNumFloatingSpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumFloatingSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getNumFloatingSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.isFloatingSpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isFloatingSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">isFloatingSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if the Id is a floating species</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isSetBoundaryCondition</span><span class="p">():</span>
+              <span class="k">return</span> <span class="kc">False</span>
+           <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Id: &#39;</span> <span class="o">+</span> <span class="n">Id</span> <span class="o">+</span> <span class="s1">&#39; in isFloatingSpecies is not a species Id&#39;</span><span class="p">)</span>  </div>
+
+<div class="viewcode-block" id="SbmlModel.isBoundarySpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isBoundarySpecies">[docs]</a>    <span class="k">def</span> <span class="nf">isBoundarySpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if the Id is a boundary species</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isSetBoundaryCondition</span><span class="p">():</span>
+              <span class="k">return</span> <span class="kc">True</span>
+           <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Id: &#39;</span> <span class="o">+</span> <span class="n">Id</span> <span class="o">+</span> <span class="s1">&#39; in isFloatingSpecies is not a species Id&#39;</span><span class="p">)</span>  </div>
+
+<div class="viewcode-block" id="SbmlModel.isAmount"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isAmount">[docs]</a>    <span class="k">def</span> <span class="nf">isAmount</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if species Id has assigned to it an amount rather then a concentration&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isSetInitialAmount</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Id: &#39;</span> <span class="o">+</span> <span class="n">Id</span> <span class="o">+</span> <span class="s1">&#39; in isAmount is not a species Id&#39;</span><span class="p">)</span>  </div>
+
+<div class="viewcode-block" id="SbmlModel.isConcentration"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isConcentration">[docs]</a>    <span class="k">def</span> <span class="nf">isConcentration</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if species Id has assigned to it a concentration rather then an amount&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isSetInitialConcentration</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Id: &#39;</span> <span class="o">+</span> <span class="n">Id</span> <span class="o">+</span> <span class="s1">&#39; in isConcentration is not a species Id&#39;</span><span class="p">)</span>  </div>
+
+
+<div class="viewcode-block" id="SbmlModel.getNumFloatingSpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumFloatingSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getNumFloatingSpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of floating species.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getListOfFloatingSpecies</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getNumBoundarySpecies"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumBoundarySpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getNumBoundarySpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumBoundarySpecies"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumBoundarySpecies">[docs]</a>    <span class="k">def</span> <span class="nf">getNumBoundarySpecies</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of boundary species.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -749,7 +830,7 @@
     <span class="c1">#def getParameter(self, param_id):</span>
     <span class="c1">#    return self.model.getParameter(param_id)</span>
 
-<div class="viewcode-block" id="sbmlModel.getListOfParameters"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfParameters">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfParameters"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfParameters">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all global parameter Ids in the model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -761,7 +842,7 @@
         <span class="k">return</span> <span class="n">alist</span></div>
 
     
-<div class="viewcode-block" id="sbmlModel.isParameterValueSet"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.isParameterValueSet">[docs]</a>    <span class="k">def</span> <span class="nf">isParameterValueSet</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.isParameterValueSet"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isParameterValueSet">[docs]</a>    <span class="k">def</span> <span class="nf">isParameterValueSet</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns true if the parameter has been assigned a value</span>
 
@@ -776,7 +857,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getParameterValue"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getParameterValue">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterValue</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getParameterValue"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getParameterValue">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterValue</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the value for a given model parameter.</span>
 
@@ -791,7 +872,7 @@
            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Parameter does not exist&#39;</span><span class="p">)</span>      </div>
         
-<div class="viewcode-block" id="sbmlModel.getListOfReactions"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfReactions">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfReactions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfReactions"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfReactions">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfReactions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all reaction Ids.</span>
 <span class="sd">        &quot;&quot;&quot;</span>       
@@ -802,7 +883,7 @@
             <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
         <span class="k">return</span> <span class="n">alist</span></div>
     
-<div class="viewcode-block" id="sbmlModel.getNumReactants"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumReactants">[docs]</a>    <span class="k">def</span> <span class="nf">getNumReactants</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumReactants"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumReactants">[docs]</a>    <span class="k">def</span> <span class="nf">getNumReactants</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Returns the number of reactants in the reaction given by the Id argument.</span>
 
@@ -817,7 +898,7 @@
            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getNumReactants</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Reaction does not exist&#39;</span><span class="p">)</span>  </div>
         
-<div class="viewcode-block" id="sbmlModel.getNumProducts"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumProducts">[docs]</a>    <span class="k">def</span> <span class="nf">getNumProducts</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumProducts"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumProducts">[docs]</a>    <span class="k">def</span> <span class="nf">getNumProducts</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of products in the reaction given by the Id argument.</span>
 
@@ -832,7 +913,7 @@
            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getNumProducts</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Reaction does not exist&#39;</span><span class="p">)</span> </div>
         
-<div class="viewcode-block" id="sbmlModel.getRateLaw"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getRateLaw">[docs]</a>    <span class="k">def</span> <span class="nf">getRateLaw</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getRateLaw"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getRateLaw">[docs]</a>    <span class="k">def</span> <span class="nf">getRateLaw</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the expression for the rate laws of the reaction given by the specified Id</span>
 
@@ -847,7 +928,7 @@
            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getKineticLaw</span><span class="p">()</span><span class="o">.</span><span class="n">getFormula</span><span class="p">()</span>
         <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Reaction does not exist&#39;</span><span class="p">)</span>      </div>
               
-<div class="viewcode-block" id="sbmlModel.getReactant"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getReactant">[docs]</a>    <span class="k">def</span> <span class="nf">getReactant</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">reactantIndex</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getReactant"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getReactant">[docs]</a>    <span class="k">def</span> <span class="nf">getReactant</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">reactantIndex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the Id of the reactantIndexth reactant in the reaction given by the reactionId</span>
 
@@ -863,7 +944,7 @@
         <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getReactant</span><span class="p">(</span><span class="n">reactantIndex</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">()</span></div>
     
-<div class="viewcode-block" id="sbmlModel.getProduct"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getProduct">[docs]</a>    <span class="k">def</span> <span class="nf">getProduct</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">productIndex</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getProduct"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getProduct">[docs]</a>    <span class="k">def</span> <span class="nf">getProduct</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">productIndex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the Id of the productIndexth product in the reaction given by the reactionId</span>
 
@@ -879,7 +960,7 @@
         <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getProduct</span><span class="p">(</span><span class="n">productIndex</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">()</span></div>
     
-<div class="viewcode-block" id="sbmlModel.getReactantStoichiometry"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getReactantStoichiometry">[docs]</a>    <span class="k">def</span> <span class="nf">getReactantStoichiometry</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">reactantIndex</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getReactantStoichiometry"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getReactantStoichiometry">[docs]</a>    <span class="k">def</span> <span class="nf">getReactantStoichiometry</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">reactantIndex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the stoichiometry for a reactant in a reaction.</span>
 
@@ -899,7 +980,7 @@
         <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getReactant</span><span class="p">(</span><span class="n">reactantIndex</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getStoichiometry</span> <span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getProductStoichiometry"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getProductStoichiometry">[docs]</a>    <span class="k">def</span> <span class="nf">getProductStoichiometry</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">productIndex</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getProductStoichiometry"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getProductStoichiometry">[docs]</a>    <span class="k">def</span> <span class="nf">getProductStoichiometry</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">,</span> <span class="n">productIndex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the stoichiometry for a product in a reaction.</span>
 
@@ -919,7 +1000,26 @@
         <span class="n">sr</span> <span class="o">=</span> <span class="n">ra</span><span class="o">.</span><span class="n">getProduct</span><span class="p">(</span><span class="n">productIndex</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sr</span><span class="o">.</span><span class="n">getStoichiometry</span> <span class="p">()</span></div>
         
-<div class="viewcode-block" id="sbmlModel.getListOfRules"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfRules">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfRules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumModifiers"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumModifiers">[docs]</a>    <span class="k">def</span> <span class="nf">getNumModifiers</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of modifiers in a given reaction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span> <span class="p">(</span><span class="n">reactionId</span><span class="p">)</span><span class="o">.</span><span class="n">getNumModifiers</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SbmlModel.getListOfModifiers"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfModifiers">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfModifiers</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the list of modifiers in a given reaction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">reaction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getReaction</span> <span class="p">(</span><span class="n">reactionId</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reaction</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">reaction</span><span class="o">.</span><span class="n">getNumModifiers</span><span class="p">()):</span>
+               <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">reaction</span><span class="o">.</span><span class="n">getModifer</span> <span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+           <span class="k">return</span> <span class="n">alist</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;No such reaction can be found:&#39;</span><span class="p">,</span> <span class="n">reactionId</span><span class="p">)</span></div>
+ 
+<div class="viewcode-block" id="SbmlModel.getListOfRules"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfRules">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfRules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of Ids for the rules</span>
 <span class="sd">        &quot;&quot;&quot;</span> 
@@ -930,7 +1030,7 @@
             <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
         <span class="k">return</span> <span class="n">alist</span></div>
     
-<div class="viewcode-block" id="sbmlModel.getRuleId"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getRuleId">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getRuleId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getRuleId">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the rule Id of the indexth rule</span>
 
@@ -938,7 +1038,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getRuleRightSide"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getRuleRightSide">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleRightSide</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getRuleRightSide"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getRuleRightSide">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleRightSide</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the formula on the right-hand side of the rule in question.</span>
 
@@ -948,7 +1048,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span><span class="o">.</span><span class="n">getFormula</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getRuleType"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getRuleType">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleType</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getRuleType"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getRuleType">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleType</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a string indicating the type of rule in question.</span>
 
@@ -966,7 +1066,7 @@
            <span class="k">return</span> <span class="s1">&#39;Algebraic rule&#39;</span> 
         <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Unknown rule in SBML model&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getEventId"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventId">[docs]</a>    <span class="k">def</span> <span class="nf">getEventId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getEventId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getEventId">[docs]</a>    <span class="k">def</span> <span class="nf">getEventId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the Id for the indexth event</span>
 
@@ -974,7 +1074,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getEvent</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getEventString"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventString">[docs]</a>    <span class="k">def</span> <span class="nf">getEventString</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getEventString"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getEventString">[docs]</a>    <span class="k">def</span> <span class="nf">getEventString</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the indexth event as a compelte string.</span>
 
@@ -991,7 +1091,7 @@
         <span class="n">astr</span> <span class="o">=</span> <span class="n">astr</span> <span class="o">+</span> <span class="s1">&#39; }&#39;</span>
         <span class="k">return</span> <span class="n">astr</span></div>
         
-<div class="viewcode-block" id="sbmlModel.getEventTrigger"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventTrigger">[docs]</a>    <span class="k">def</span> <span class="nf">getEventTrigger</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getEventTrigger"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getEventTrigger">[docs]</a>    <span class="k">def</span> <span class="nf">getEventTrigger</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the formula as a string for the event trigger of the event event.</span>
 
@@ -1003,14 +1103,14 @@
         <span class="n">trig</span> <span class="o">=</span> <span class="n">myEvent</span><span class="o">.</span><span class="n">getTrigger</span><span class="p">()</span>        
         <span class="k">return</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span> <span class="p">(</span><span class="n">trig</span><span class="o">.</span><span class="n">getMath</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getNumEventAssignments"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumEventAssignments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumEventAssignments</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumEventAssignments"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumEventAssignments">[docs]</a>    <span class="k">def</span> <span class="nf">getNumEventAssignments</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of assignments in the indexth rule.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getEvent</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">event</span><span class="o">.</span><span class="n">getNumEventAssignments</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getEventVariable"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventVariable">[docs]</a>    <span class="k">def</span> <span class="nf">getEventVariable</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">assignmentIndex</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getEventVariable"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getEventVariable">[docs]</a>    <span class="k">def</span> <span class="nf">getEventVariable</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">assignmentIndex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the event variables (i.e the left-hand side) for the assignmentIndexth assignment</span>
 <span class="sd">        in the event, given by event,</span>
@@ -1023,7 +1123,7 @@
         <span class="n">eventAss</span> <span class="o">=</span> <span class="n">myEvent</span><span class="o">.</span><span class="n">getEventAssignment</span><span class="p">(</span><span class="n">assignmentIndex</span><span class="p">)</span>  
         <span class="k">return</span> <span class="n">eventAss</span><span class="o">.</span><span class="n">getVariable</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getEventAssignment"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getEventAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">getEventAssignment</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">assignmentIndex</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getEventAssignment"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getEventAssignment">[docs]</a>    <span class="k">def</span> <span class="nf">getEventAssignment</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">assignmentIndex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retuns the assignmentIndexth assignment in the event event.</span>
 
@@ -1036,7 +1136,22 @@
         <span class="n">m</span> <span class="o">=</span> <span class="n">eventAss</span><span class="o">.</span><span class="n">getMath</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getFunctionId"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getFunctionId">[docs]</a>    <span class="k">def</span> <span class="nf">getFunctionId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfFunctionIds"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfFunctionIds">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfFunctionIds</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of function definition Ids</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumFunctionDefinitions</span><span class="p">()):</span>
+            <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getFunctionDefinition</span> <span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">alist</span></div>
+
+<div class="viewcode-block" id="SbmlModel.getNumFunctionDefinitions"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumFunctionDefinitions">[docs]</a>    <span class="k">def</span> <span class="nf">getNumFunctionDefinitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of user defined functions in the model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getNumFunctionDefinitions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SbmlModel.getFunctionId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getFunctionId">[docs]</a>    <span class="k">def</span> <span class="nf">getFunctionId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retuns the Id of the indexth user function definition</span>
 
@@ -1044,13 +1159,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getFunctionDefinition</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getFunctionBody"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getFunctionBody">[docs]</a>    <span class="k">def</span> <span class="nf">getFunctionBody</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getFunctionBody"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getFunctionBody">[docs]</a>    <span class="k">def</span> <span class="nf">getFunctionBody</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span> 
         <span class="n">myFunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getFunctionDefinition</span> <span class="p">(</span><span class="n">func</span><span class="p">)</span> 
         <span class="k">return</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">formulaToL3String</span><span class="p">(</span><span class="n">myFunc</span><span class="o">.</span><span class="n">getBody</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="sbmlModel.getNumArgumentsInUserFunction"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getNumArgumentsInUserFunction">[docs]</a>    <span class="k">def</span> <span class="nf">getNumArgumentsInUserFunction</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getNumArgumentsInUserFunction"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumArgumentsInUserFunction">[docs]</a>    <span class="k">def</span> <span class="nf">getNumArgumentsInUserFunction</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the number of arguments in the given function. The func argument can either be the name</span>
 <span class="sd">        of a user function or its index.</span>
@@ -1064,10 +1179,10 @@
         <span class="n">myFunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getFunctionDefinition</span> <span class="p">(</span><span class="n">func</span><span class="p">)</span> 
         <span class="k">return</span> <span class="n">myFunc</span><span class="o">.</span><span class="n">getNumArguments</span><span class="p">()</span>                </div>
 
-<div class="viewcode-block" id="sbmlModel.getListOfArgumentsInUserFunction"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.getListOfArgumentsInUserFunction">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfArgumentsInUserFunction</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfArgumentsInUserFunction"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfArgumentsInUserFunction">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfArgumentsInUserFunction</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a list of arguments in teh specified unser function. The func argument can either be the name</span>
-<span class="sd">        of a user function or its index.</span>
+<span class="sd">        Returns a list of arguments in the specified user function. The func argument can either be the name</span>
+<span class="sd">        of a user function or its index in the list of user fucntions.</span>
 
 <span class="sd">        Example: </span>
 
@@ -1102,7 +1217,7 @@
     <span class="c1"># def getListOfInitialAssignments(self):</span>
     <span class="c1">#     return self.model.getListOfInitialAssignments()</span>
 
-<div class="viewcode-block" id="sbmlModel.toSBML"><a class="viewcode-back" href="../index.html#simplesbml.sbmlModel.toSBML">[docs]</a>    <span class="k">def</span> <span class="nf">toSBML</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.toSBML"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.toSBML">[docs]</a>    <span class="k">def</span> <span class="nf">toSBML</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the model in SBML format as a string.  Also checks model consistency</span>
 <span class="sd">       and prints all errors and warnings.</span>
 
