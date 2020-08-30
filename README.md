@@ -16,7 +16,7 @@ The difference between 1.3.0 and 1.3.1 is that the later includes get supoprt fo
 
 1.3.2 has enhanced documentation, support for user functions, and some bug fixes
 
-1.3.3 adds new help functions for checking amounts and concentrations. Also the class name has been capitalized to match usesal conventions in Python, so the class name is now SbmlModel.
+1.3.3 adds new help functions for checking amounts and concentrations. Also the class name has been capitalized to match usual conventions in Python, so the class name is now SbmlModel.
 
 # How to install SimpleSBML
 
