@@ -7,9 +7,9 @@ Created on Tue Jan 27 23:13:42 2015, 2020
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .simplesbml import sbmlModel
+from .simplesbml import SbmlModel
 
-__version__ = '1.3.2'
+__version__ = '1.3.3'
 
 
 
