@@ -28,16 +28,16 @@ def _checkSBMLDocument(document):
   if (document.getNumErrors() > 0):
     raise ValueError("Errors in SBML document")
 
-class sbmlModel(object):
+class SbmlModel(object):
 
     """   
-    sbmlModel is used to construct simple models using libSBML methods and
+    SbmlModel is used to construct simple models using libSBML methods and
     print out the model in SBML format.  A user can add species, parameters,
     reactions, events, assignment rules, rate rules, and initial assignments
     to a model.  Then, the user can view the model in SBML format by printing
     the string representation of the class.
 
-    sbmlModel contains two attributes: *document*, an
+    SbmlModel contains two attributes: *document*, an
     `SBMLDocument <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_s_b_m_l_document.html>`_
     object, an
     *model*, the
@@ -47,7 +47,7 @@ class sbmlModel(object):
     You can also pass a SBML string and use simlesbml to obtain information about the model
     using the get methods, e.g
        
-    model = simplesbml.sbmlModel (sbmlStr=mySBMLString)
+    model = simplesbml.SbmlModel (sbmlStr=mySBMLString)
     """
 
     def __init__(self, time_units='second', extent_units='mole', \
@@ -117,7 +117,7 @@ class sbmlModel(object):
         """Adds a `Compartment <http://sbml.org/Software/libSBML/docs/python-api/classlibsbml_1_1_compartment.html>`_
         of volume *vol* litres to the model.  The default volume is 1 litre. If the user does
         not specify *comp_id*, the id is set to 'c<n>' where the new compartment
-        is the nth compartment added to the model. All sbmlModel objects are
+        is the nth compartment added to the model. All SbmlModel objects are
         initialized with a default compartment 'c1'."""
 
         c1 = self.model.createCompartment()
@@ -505,9 +505,9 @@ class sbmlModel(object):
         p = self.model.getCompartment(Id)
         if p != None:
            return p.getVolume()
-        raise Exception ('Compartment does not exist')       
-     
+        raise Exception ('Compartment does not exist')         
         
+    # --------------------------------------------------------------
     def getListOfAllSpecies(self):
         """
         Returns a list of **ALL** species Ids in the model
@@ -519,6 +519,28 @@ class sbmlModel(object):
            alist.append (sp.getId())         
         return alist
     
+    def getNthFloatingSpeciesId (self, index):
+        """
+        Returns the Id of the nth floating speces
+        """
+        return self.getListOfFloatingSpecies()[index]
+
+    def getNthBoundarySpeciesId (self, index):
+        """
+        Returns the Id of the nth boundary speces
+        """
+        return self.getListOfBoundarySpecies()[index]
+
+    def getCompartmentIdSpeciesIsIn (self, speciesId):
+        """
+        Returns the compartment Id that the species givenin th argument is in.
+        """
+        sp = self.model.getSpecies(speciesId)
+        if sp != None:
+            return sp.getCompartment()
+        else:
+            raise Exception ('Species Id:' + speciesId + ' does not exist in the model') 
+
     def isSpeciesValueSet (self, Id):
         """
         Returns true if the species has been set a value (concentration or amount).
@@ -601,7 +623,7 @@ class sbmlModel(object):
            else:
               return True
         else:
-           raise Exception ('Id in isFloatingSpecies is not a species Id')  
+           raise Exception ('Id: ' + Id + ' in isFloatingSpecies is not a species Id')  
 
     def isBoundarySpecies (self, Id):
         """
@@ -614,7 +636,33 @@ class sbmlModel(object):
            else:
               return False
         else:
-           raise Exception ('Id in isFloatingSpecies is not a species Id')  
+           raise Exception ('Id: ' + Id + ' in isFloatingSpecies is not a species Id')  
+
+    def isAmount (self, Id):
+        """
+        Returns true if species Id has assigned to it an amount rather then a concentration"
+        """
+        sp = self.model.getSpecies(Id)
+        if sp != None:
+            if sp.isSetInitialAmount():
+                return True
+            else:
+                return False
+        else:
+           raise Exception ('Id: ' + Id + ' in isAmount is not a species Id')  
+
+    def isConcentration (self, Id):
+        """
+        Returns true if species Id has assigned to it a concentration rather then an amount"
+        """
+        sp = self.model.getSpecies(Id)
+        if sp != None:
+            if sp.isSetInitialConcentration():
+                return True
+            else:
+                return False
+        else:
+           raise Exception ('Id: ' + Id + ' in isConcentration is not a species Id')  
 
 
     def getNumFloatingSpecies (self):
@@ -937,6 +985,21 @@ class sbmlModel(object):
         eventAss = myEvent.getEventAssignment(assignmentIndex)                
         m = eventAss.getMath()
         return libsbml.formulaToL3String(m)
+
+    def getListOfFunctionIds (self):
+        """
+        Returns a list of function definition Ids
+        """
+        alist = []
+        for i in range (self.model.getNumFunctionDefinitions()):
+            alist.append (self.model.getFunctionDefinition (i).getId())
+        return alist
+
+    def getNumFunctionDefinitions(self):
+        """
+        Returns the number of user defined functions in the model
+        """
+        return self.model.getNumFunctionDefinitions()
 
     def getFunctionId (self, index):
         """

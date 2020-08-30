@@ -42,10 +42,10 @@ Examples
 
 Example models are taken from the SBML Level 3 Version 1 documentation.
 
-Here is an example of a simple reaction-based model built with sbmlModel::
+Here is an example of a simple reaction-based model built with SbmlModel::
 
     import simplesbml
-    model = simplesbml.sbmlModel()
+    model = simplesbml.SbmlModel()
     model.addCompartment(1e-14, comp_id='comp')
     model.addSpecies('E', 5e-21, comp='comp')
     model.addSpecies('S', 1e-20, comp='comp')
@@ -57,7 +57,7 @@ Here is an example of a simple reaction-based model built with sbmlModel::
 In this example, reaction rate constants are stored locally with the reactions where they are used.  It is also possible to define global parameters and use them in reaction expressions.  Here is an example of this usage::
 
     import simplesbml
-    model = simplesbml.sbmlModel()
+    model = simplesbml.SbmlModel()
     model.addCompartment(1e-14, comp_id='comp')
     model.addSpecies('E', 5e-21, comp='comp')
     model.addSpecies('S', 1e-20, comp='comp')
@@ -69,10 +69,10 @@ In this example, reaction rate constants are stored locally with the reactions w
     model.addReaction(['E', 'S'], ['ES'], 'comp*(kon*E*S-koff*ES)', rxn_id='veq')
     model.addReaction(['ES'], ['E', 'P'], 'comp*kcat*ES', rxn_id='vcat')
 
-sbmlModel also supports the use of events to change the system state under certain conditions, and the use of assignment rules and rate rules to explicitly define variable values as a function of the system state.  Here is an example of events and rate rules. In this example, the value of parameter G2 is instantaneously determined by the relationship between P1 and tau, and the rates of change of P1 and P2 are explicitly defined in equation form instead of with a reaction::
+SbmlModel also supports the use of events to change the system state under certain conditions, and the use of assignment rules and rate rules to explicitly define variable values as a function of the system state.  Here is an example of events and rate rules. In this example, the value of parameter G2 is instantaneously determined by the relationship between P1 and tau, and the rates of change of P1 and P2 are explicitly defined in equation form instead of with a reaction::
 
     import simplesbml
-    model = simplesbml.sbmlModel()
+    model = simplesbml.SbmlModel()
     model.addCompartment(vol=1.0, comp_id='cell')
     model.addSpecies('[P1]', 0.0, comp='cell')
     model.addSpecies('[P2]', 0.0, comp='cell')
@@ -86,10 +86,10 @@ sbmlModel also supports the use of events to change the system state under certa
     model.addRateRule('P1', 'k1 * (G1 - P1)')
     model.addRateRule('P2', 'k2 * (G2 - P2)')
 
-Users can edit existing models with the writeCode() method, which accepts an SBML document and produces a script of SimpleSBML commands in string format.  This method converts the SBML document into a libSBML Model and scans through its elements, adding lines of code for each SimpleSBML-compatible element it finds.  The output can be saved to a .py file and edited to create new models based on the original import.  For instance, here is an example of a short script that reproduces the SimpleSBML code to reproduce an sbmlModel object::
+Users can edit existing models with the writeCode() method, which accepts an SBML document and produces a script of SimpleSBML commands in string format.  This method converts the SBML document into a libSBML Model and scans through its elements, adding lines of code for each SimpleSBML-compatible element it finds.  The output can be saved to a .py file and edited to create new models based on the original import.  For instance, here is an example of a short script that reproduces the SimpleSBML code to reproduce an SbmlModel object::
 
     import simplesbml
-    model = simplesbml.sbmlModel()
+    model = simplesbml.SbmlModel()
     model.addCompartment(1e-14, comp_id='comp')
     model.addSpecies('E', 5e-21, comp='comp')
     model.addSpecies('S', 1e-20, comp='comp')
@@ -106,7 +106,7 @@ Users can edit existing models with the writeCode() method, which accepts an SBM
 The output saved to 'example_code.py' will look like this::
 
     import simplesbml
-    model = simplesbml.sbmlModel(sub_units='')
+    model = simplesbml.SbmlModel(sub_units='')
     model.addCompartment(vol=1e-14, comp_id='comp')
     model.addSpecies(species_id='E', amt=5e-21, comp='comp')
     model.addSpecies(species_id='S', amt=1e-20, comp='comp')
@@ -122,15 +122,15 @@ Verison 1.3.x has a set of new 'get' methods that allows a user to easily interr
 
     import simplesbml
     mymodel = loadFromFile ('mymodel.xml')  # Load the model into a string variable
-    model = simplesbml.sbmlModel(strSbml=mymodel)
+    model = simplesbml.SbmlModel(strSbml=mymodel)
 
     # Or:
 
-    model = simplesbml.sbmlModel(strFile='mymodel.xml')
+    model = simplesbml.SbmlModel(strFile='mymodel.xml')
 
     # Or of you're using the Tellurium package:
 
-    model = simplesbml.sbmlModel(strSbml=r.getSBML())    
+    model = simplesbml.SbmlModel(strSbml=r.getSBML())    
   
     print ('Num compartmetns = ', s.getNumCompartments())
     print ('Num parameters =', s.getNumParameters())
@@ -151,5 +151,5 @@ Classes and Methods
 
 .. automodule:: simplesbml
 
-.. autoclass:: sbmlModel
+.. autoclass:: SbmlModel
    :members: 
