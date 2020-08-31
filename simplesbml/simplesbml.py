@@ -492,6 +492,13 @@ class SbmlModel(object):
            alist.append (comp.getId())
         return alist
     
+
+    def getCompartmentId (self, index):
+        """
+        Returns the indexth compartment from the list of compartments
+        """
+        return self.getListOfCompartments()[index]
+
     def getCompartmentVolume (self, Id):
         """
         **Parameters**
@@ -521,13 +528,13 @@ class SbmlModel(object):
     
     def getNthFloatingSpeciesId (self, index):
         """
-        Returns the Id of the nth floating speces
+        Returns the Id of the nth floating species
         """
         return self.getListOfFloatingSpecies()[index]
 
     def getNthBoundarySpeciesId (self, index):
         """
-        Returns the Id of the nth boundary speces
+        Returns the Id of the nth boundary species
         """
         return self.getListOfBoundarySpecies()[index]
 
@@ -691,6 +698,11 @@ class SbmlModel(object):
             alist.append (p.getId())             
         return alist
 
+    def getParameterId (self, index):
+        """
+        Returns the indexth parameter from the list of parameter
+        """
+        return self.getListOfParameters()[index]
     
     def isParameterValueSet (self, Id):
         """
@@ -718,9 +730,13 @@ class SbmlModel(object):
         Example: value = model.getParameterValue ('k1')       
         """      
         p = self.model.getParameter(Id)
-        if p.isSetValue():
-           return p.getValue()
-        raise Exception ('Parameter does not exist')      
+        if p != None:
+           if p.isSetValue():
+              return p.getValue()
+           else:
+              return 0
+        else:
+           raise Exception ('Parameter does not exist')      
         
     def getListOfReactions(self):
         """
@@ -733,6 +749,12 @@ class SbmlModel(object):
             alist.append (p.getId())             
         return alist
     
+    def getNthReactionId (self, index):
+        """
+        Returns the Id of the nth reaction
+        """
+        return self.getListOfReactions()[index]
+
     def getNumReactants (self, Id):
         """
          Returns the number of reactants in the reaction given by the Id argument.
@@ -915,6 +937,49 @@ class SbmlModel(object):
         if t1 == libsbml.SBML_ALGEBRAIC_RULE:
            return 'Algebraic rule' 
         raise Exception ('Unknown rule in SBML model')
+
+    def isRuleType_Assignment (self, rule):
+        """
+        Returns true the rule is an assignemnt type
+        """
+        myRule = self.model.getRule (rule)
+        if myRule != None:
+           t1 = myRule.getTypeCode()
+           if t1 == libsbml.SBML_ASSIGNMENT_RULE:
+              return True
+           else:
+              return False 
+        else:
+           raise Exception ('The rule: ' + str (rule) + ', does not exist') 
+
+    def isRuleType_Rate (self, rule):
+        """
+        Returns true the rule is an rate rule (ode) type
+        """
+        myRule = self.model.getRule (rule)
+        if myRule != None:
+           t1 = myRule.getTypeCode()
+           if t1 == libsbml.SBML_RATE_RULE:
+              return True
+           else:
+              return False 
+        else:
+           raise Exception ('The rule: ' + str (rule) + ', does not exist') 
+
+    def isRuleType_Algebraic (self, rule):
+        """
+        Returns true the rule is an algebraic rule type
+        """
+        myRule = self.model.getRule (rule)
+        if myRule != None:
+           t1 = myRule.getTypeCode()
+           if t1 == libsbml.SBML_ALGEBRAIC_RULE:
+              return True
+           else:
+              return False 
+        else:
+           raise Exception ('The rule: ' + str (rule) + ', does not exist') 
+
 
     def getEventId (self, index):
         """
