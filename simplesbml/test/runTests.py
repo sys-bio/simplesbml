@@ -12,13 +12,14 @@ import simplesbml
 testCount = 0
 failedTests = []
     
-def initializeTests(modelStr):
+def initializeTests(title, modelStr):
     global testCount
     global failedTests
     testCount = 0
     failedTests = []
     r = te.loada (modelStr)
     sbmlStr = r.getSBML()
+    print ('\nBegin Report: ' + title)
     return simplesbml.SbmlModel (sbmlStr=sbmlStr)
 
 def printReport():
@@ -32,6 +33,7 @@ def printReport():
        print ('Failed Tests:' ) 
     for i in failedTests:
         print (i, ' ')
+    print ('End Report')
        
 def assertEqual (func, arguments, result):
     global testCount
@@ -57,7 +59,7 @@ model = """
   k1 = 0.1; S1 = 10; S2 = 2.5
 """
 
-model = initializeTests(model)
+model = initializeTests('Test 1', model)
 
 assertEqual (model.getNumCompartments, None, 1)
 assertEqual (model.getNumFloatingSpecies, None, 2)
@@ -84,7 +86,7 @@ assertEqual (model.getListOfBoundarySpecies, None, [])
 
 assertEqual (model.isConcentration, 'S1', True)
 assertEqual (model.getNumParameters, None, 1)
-assertEqual (model.getListOfParameters, None, ['k1'])
+assertEqual (model.getListOfParameterIds, None, ['k1'])
 assertEqual (model.getParameterId, 0, 'k1')
 assertEqual (model.isParameterValueSet, 'k1', True)
 assertEqual (model.getParameterValue, 'k1', 0.1)
@@ -110,7 +112,7 @@ modelStr = """
         S1 = 10; S2 = 2.5; S3 = 3.4
 """
 
-model = initializeTests(modelStr)
+model = initializeTests('Test 2', modelStr)
 
 assertEqual (model.getNumCompartments, None, 1)
 assertEqual (model.getNumFloatingSpecies, None, 2)
@@ -137,7 +139,7 @@ assertEqual (model.getListOfBoundarySpecies, None, ['S1'])
 
 assertEqual (model.isConcentration, 'S1', True)
 assertEqual (model.getNumParameters, None, 3)
-assertEqual (model.getListOfParameters, None, ['k1', 'k2', 'k3'])
+assertEqual (model.getListOfParameterIds, None, ['k1', 'k2', 'k3'])
 assertEqual (model.getParameterId, 0, 'k1')
 assertEqual (model.isParameterValueSet, 'k1', True)
 assertEqual (model.getParameterValue, 'k1', 0.1)
@@ -163,7 +165,7 @@ modelStr = """
         S1 = 10; S2 = 2.5; S3 = 3.4;
         """
         
-model = initializeTests(modelStr)            
+model = initializeTests('Test 3', modelStr)            
 
 assertEqual (model.getNumCompartments, None, 1)
 assertEqual (model.getNumFloatingSpecies, None, 3)
@@ -190,7 +192,7 @@ assertEqual (model.getListOfBoundarySpecies, None, ['S1'])
 
 assertEqual (model.isConcentration, 'S1', True)
 assertEqual (model.getNumParameters, None, 3)
-assertEqual (model.getListOfParameters, None, ['k1', 'k2', 'k3'])
+assertEqual (model.getListOfParameterIds, None, ['k1', 'k2', 'k3'])
 assertEqual (model.getParameterId, 0, 'k1')
 assertEqual (model.isParameterValueSet, 'k1', True)
 assertEqual (model.getParameterValue, 'k1', 0.1)
@@ -220,27 +222,28 @@ printReport()
 # ==================================================================
 
 modelStr = """
-        Jxx: 2 S1 + 3 S2 -> 5 S3 + 7 S4; v
+        J1: 2 S1 + 3 S2 -> 5 S3 + 7 S4; v
         v = 0
         S1 = 10; S2 = 2.5; S3 = 3.4; S4 = 0
         """
  
-model = initializeTests(modelStr)            
+model = initializeTests('Test 4', modelStr)            
 
-assertEqual (model.getListOfReactionIds, None, ['Jxx'])
-assertEqual (model.getNthReactionId, 0, 'Jxx')
+assertEqual (model.getListOfReactionIds, None, ['J1'])
+assertEqual (model.getNthReactionId, 0, 'J1')
 assertEqual (model.getNumReactants, 0, 2)
 assertEqual (model.getNumProducts, 0, 2)
 assertEqual (model.getRateLaw, 0, 'v')
-assertEqual (model.getReactant, ['Jxx', 0], 'S1')
-assertEqual (model.getReactant, ['Jxx', 1], 'S2')
-assertEqual (model.getProduct, ['Jxx', 0], 'S3')
-assertEqual (model.getProduct, ['Jxx', 1], 'S4')
-assertEqual (model.getReactantStoichiometry, ['_J0', 0], 1)
-assertEqual (model.getReactantStoichiometry, ['_J0', 1], 1)
-assertEqual (model.getProductStoichiometry, ['_J0', 0], 1)
+assertEqual (model.getReactant, ['J1', 0], 'S1')
+assertEqual (model.getReactant, ['J1', 1], 'S2')
+assertEqual (model.getProduct, ['J1', 0], 'S3')
+assertEqual (model.getProduct, ['J1', 1], 'S4')
+assertEqual (model.getReactantStoichiometry, ['J1', 0], 2)
+assertEqual (model.getReactantStoichiometry, ['J1', 1], 3)
+assertEqual (model.getProductStoichiometry, ['J1', 0], 5)
+assertEqual (model.getProductStoichiometry, ['J1', 1], 7)
 
-
+printReport()
 
 # ==================================================================
 
@@ -252,7 +255,7 @@ modelStr = """
         S1 = 10; S2 = 2.5; S3 = 3.4;
         """
  
-model = initializeTests(modelStr)            
+model = initializeTests('Test 5', modelStr)            
 
 assertEqual (model.getNumCompartments, None, 1)
 assertEqual (model.getNumFloatingSpecies, None, 3)
@@ -279,7 +282,7 @@ assertEqual (model.getListOfBoundarySpecies, None, ['S1'])
 
 assertEqual (model.isConcentration, 'S1', True)
 assertEqual (model.getNumParameters, None, 3)
-assertEqual (model.getListOfParameters, None, ['k1', 'k2', 'k3'])
+assertEqual (model.getListOfParameterIds, None, ['k1', 'k2', 'k3'])
 assertEqual (model.getParameterId, 0, 'k1')
 assertEqual (model.isParameterValueSet, 'k1', True)
 assertEqual (model.getParameterValue, 'k2', 0.2)
@@ -315,11 +318,47 @@ printReport()
 # ==================================================================
 
 modelStr = """
-        k1 := 7.8
-        $S1 + S2 -> S3; k1*S1*S2;
-        S3 -> 2 S4; k2*S3-k3*S4
-        k2 = 0.2; k3 = 0.3
-        S1 = 10; S2 = 2.5; S3 = 3.4;
+           k1 := sin (time)
+           k2 := k1 + 3.14
+           
+           S1 -> S2; v
+           S1 = 1; S2 = 0; v = 0
         """
  
-model = initializeTests(modelStr)            
+model = initializeTests('Test 6', modelStr)            
+
+assertEqual (model.getNumRules, None, 2)
+
+assertEqual (model.getRuleId, 0, 'k1')
+assertEqual (model.getRuleRightSide, 0, 'sin(time)')
+assertEqual (model.getRuleType, 0, 'Assignment rule')
+assertEqual (model.isRuleType_Assignment, 0, True)
+
+assertEqual (model.getRuleId, 1, 'k2')
+assertEqual (model.getRuleRightSide, 1, 'k1 + 3.14')
+assertEqual (model.getRuleType, 1, 'Assignment rule')
+assertEqual (model.isRuleType_Assignment, 1, True)
+
+printReport()
+
+# ==================================================================
+
+modelStr = """ 
+           model rabbit()         
+
+           k1 = 1.1; k2 = 2.2; k3 = 3.3; k4 = 4.4
+           k5 = 5.5; k6 = 6.6; k7 = 7.7; k8 = 8.8
+           end
+        """
+ 
+model = initializeTests('Test 7', modelStr)            
+
+assertEqual (model.getModelId, None, 'rabbit')
+assertEqual (model.getNumParameters, None, 8)
+assertEqual (model.getListOfParameterIds, None, ['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8'])
+assertEqual (model.getParameterValue, 'k1', 1.1)
+assertEqual (model.getParameterValue, 1, 2.2)
+assertEqual (model.getParameterValue, 'k3', 3.3)
+
+printReport()
+
