@@ -219,6 +219,30 @@ printReport()
 
 # ==================================================================
 
+modelStr = """
+        Jxx: 2 S1 + 3 S2 -> 5 S3 + 7 S4; v
+        v = 0
+        S1 = 10; S2 = 2.5; S3 = 3.4; S4 = 0
+        """
+ 
+model = initializeTests(modelStr)            
+
+assertEqual (model.getListOfReactionIds, None, ['Jxx'])
+assertEqual (model.getNthReactionId, 0, 'Jxx')
+assertEqual (model.getNumReactants, 0, 2)
+assertEqual (model.getNumProducts, 0, 2)
+assertEqual (model.getRateLaw, 0, 'v')
+assertEqual (model.getReactant, ['Jxx', 0], 'S1')
+assertEqual (model.getReactant, ['Jxx', 1], 'S2')
+assertEqual (model.getProduct, ['Jxx', 0], 'S3')
+assertEqual (model.getProduct, ['Jxx', 1], 'S4')
+assertEqual (model.getReactantStoichiometry, ['_J0', 0], 1)
+assertEqual (model.getReactantStoichiometry, ['_J0', 1], 1)
+assertEqual (model.getProductStoichiometry, ['_J0', 0], 1)
+
+
+
+# ==================================================================
 
 modelStr = """
         k1 := 7.8
@@ -287,3 +311,15 @@ assertEqual (model.getRuleType, 0, 'Assignment rule')
 assertEqual (model.isRuleType_Assignment, 0, True)
 
 printReport()
+
+# ==================================================================
+
+modelStr = """
+        k1 := 7.8
+        $S1 + S2 -> S3; k1*S1*S2;
+        S3 -> 2 S4; k2*S3-k3*S4
+        k2 = 0.2; k3 = 0.3
+        S1 = 10; S2 = 2.5; S3 = 3.4;
+        """
+ 
+model = initializeTests(modelStr)            
