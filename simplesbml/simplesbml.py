@@ -25,8 +25,9 @@ def _isSBMLModel(obj):
     return False
 
 def _checkSBMLDocument(document): 
-  if (document.getNumErrors() > 0):
-    raise ValueError("Errors in SBML document")
+  document.getErrorLog().getNumFailsWithSeverity(2)
+  #if (document.getNumErrors() > 0):
+  #  raise ValueError("Errors in SBML document")
 
 class SbmlModel(object):
 
@@ -92,7 +93,6 @@ class SbmlModel(object):
                         xml = fd.read()
                    reader = libsbml.SBMLReader()  
                    self.document = reader.readSBMLFromString(xml)
-                   self.document.setConsistencyChecks(libsbml.LIBSBML_CAT_UNITS_CONSISTENCY, False)
                 else:
                    raise Exception ('Specified file name does not appear to be a file?')    
 
@@ -626,7 +626,7 @@ class SbmlModel(object):
         """
         sp = self.model.getSpecies(Id)
         if sp != None:
-           if sp.isSetBoundaryCondition():
+           if sp.getBoundaryCondition():
               return False
            else:
               return True
@@ -639,7 +639,7 @@ class SbmlModel(object):
         """
         sp = self.model.getSpecies(Id)
         if sp != None:
-           if sp.isSetBoundaryCondition():
+           if sp.getBoundaryCondition():
               return True
            else:
               return False
@@ -665,7 +665,7 @@ class SbmlModel(object):
         """
         sp = self.model.getSpecies(Id)
         if sp != None:
-            if sp.isSetInitialConcentration():
+            if sp.getInitialConcentration():
                 return True
             else:
                 return False
@@ -685,9 +685,6 @@ class SbmlModel(object):
         """
         return len (self.getListOfBoundarySpecies())
     
-    #def getParameter(self, param_id):
-    #    return self.model.getParameter(param_id)
-
     def getListOfParameters(self):
         """
         Returns a list of all global parameter Ids in the model.
@@ -739,7 +736,7 @@ class SbmlModel(object):
         else:
            raise Exception ('Parameter does not exist')      
         
-    def getListOfReactions(self):
+    def getListOfReactionIds (self):
         """
         Returns a list of all reaction Ids.
         """       
@@ -754,7 +751,7 @@ class SbmlModel(object):
         """
         Returns the Id of the nth reaction
         """
-        return self.getListOfReactions()[index]
+        return self.getListOfReactionIds()[index]
 
     def getNumReactants (self, Id):
         """
@@ -909,7 +906,9 @@ class SbmlModel(object):
 
         Example: rule = model.getRuleId (2)
         """         
-        return self.model.getRule (index).getId()
+        rule = self.model.getRule (index)
+        if rule != None:
+            return rule.getId()
 
     def getRuleRightSide (self, rule):
         """
@@ -919,7 +918,9 @@ class SbmlModel(object):
 
         Example: formula = model.getRuleRightSide (0)
         """
-        return self.model.getRule (rule).getFormula()
+        rule = self.model.getRule (rule)
+        if rule != None:
+            return rule.getFormula()
 
     def getRuleType (self, rule):
         """
@@ -930,14 +931,15 @@ class SbmlModel(object):
         Example: ruleStr = model.getRuleType (0)
         """
         myRule = self.model.getRule (rule)
-        t1 = myRule.getTypeCode()
-        if t1 == libsbml.SBML_RATE_RULE:
-           return 'ODE (or rate) rule' 
-        if t1 == libsbml.SBML_ASSIGNMENT_RULE:
-           return 'Assignment rule' 
-        if t1 == libsbml.SBML_ALGEBRAIC_RULE:
-           return 'Algebraic rule' 
-        raise Exception ('Unknown rule in SBML model')
+        if myRule != None:
+           t1 = myRule.getTypeCode()
+           if t1 == libsbml.SBML_RATE_RULE:
+              return 'ODE (or rate) rule' 
+           if t1 == libsbml.SBML_ASSIGNMENT_RULE:
+              return 'Assignment rule' 
+           if t1 == libsbml.SBML_ALGEBRAIC_RULE:
+              return 'Algebraic rule' 
+           raise Exception ('Unknown rule in SBML model')
 
     def isRuleType_Assignment (self, rule):
         """
@@ -951,7 +953,8 @@ class SbmlModel(object):
            else:
               return False 
         else:
-           raise Exception ('The rule: ' + str (rule) + ', does not exist') 
+           return None
+           #raise Exception ('The rule: ' + str (rule) + ', does not exist') 
 
     def isRuleType_Rate (self, rule):
         """
@@ -981,7 +984,7 @@ class SbmlModel(object):
         else:
            raise Exception ('The rule: ' + str (rule) + ', does not exist') 
 
-
+    #  ----------------------- EVENTS -------------------------
     def getEventId (self, index):
         """
         Returns the Id for the indexth event
@@ -1135,15 +1138,15 @@ class SbmlModel(object):
 
     def toSBML(self):
         """Returns the model in SBML format as a string.  Also checks model consistency
-       and prints all errors and warnings.
+        and prints all errors and warnings.
 
-       Example: print (model.toSBML())
-       """
-
+        Example: print (model.toSBML())
+        """
+        self.document.setConsistencyChecks(libsbml.LIBSBML_CAT_UNITS_CONSISTENCY, False)
         errors = self.document.checkConsistency()
         if (errors > 0):
-            for i in range(errors):
-                print(self.document.getError(i).getSeverityAsString(), ": ", self.document.getError(i).getMessage())
+           for i in range(errors):
+               print(self.document.getError(i).getSeverityAsString(), ": ", self.document.getError(i).getMessage()) 
 
         return libsbml.writeSBMLToString(self.document)
 
