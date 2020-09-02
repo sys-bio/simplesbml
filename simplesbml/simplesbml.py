@@ -92,6 +92,7 @@ class SbmlModel(object):
                         xml = fd.read()
                    reader = libsbml.SBMLReader()  
                    self.document = reader.readSBMLFromString(xml)
+                   self.document.setConsistencyChecks(libsbml.LIBSBML_CAT_UNITS_CONSISTENCY, False)
                 else:
                    raise Exception ('Specified file name does not appear to be a file?')    
 
