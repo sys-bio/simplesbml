@@ -10,13 +10,7 @@ SBML main page: http://sbml.org/Main_Page
 
 ## Versions: 
 
-The current version is 1.3.1. Compared to 1.2.x series, this adds 'get' functions to interrogate an existing SBML model.
-
-The difference between 1.3.0 and 1.3.1 is that the later includes get supoprt for events and rules.
-
-1.3.2 has enhanced documentation, support for user functions, and some bug fixes
-
-1.3.3 adds new help functions for checking amounts and concentrations. Also the class name has been capitalized to match usual conventions in Python, so the class name is now SbmlModel.
+The current version is 2.0.0. Compared to 1.2.x series, this adds 'get' functions to interrogate an existing SBML model.
 
 # How to install SimpleSBML
 
