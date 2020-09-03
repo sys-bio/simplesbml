@@ -27,6 +27,7 @@ k5 = 0; k6 = 0; k7 = 0; k8 = 0
 
 model = simplesbml.loadSBMLStr(r.getSBML())
 
+# Allocate space for the stoichiometry matrix
 stoich = np.zeros((model.getNumFloatingSpecies(), model.getNumReactions()))
 for i in range (model.getNumFloatingSpecies()):
     floatingSpeciesId = model.getNthFloatingSpeciesId (i)
