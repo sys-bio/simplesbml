@@ -20,7 +20,7 @@ def initializeTests(title, modelStr):
     r = te.loada (modelStr)
     sbmlStr = r.getSBML()
     print ('\nBegin Report: ' + title)
-    return simplesbml.SbmlModel (sbmlStr=sbmlStr)
+    return simplesbml.loadSBMLStr (sbmlStr)
 
 def printReport():
     global testCount
@@ -162,7 +162,7 @@ modelStr = """
        $S1 + S2 -> S3; k1*S1*S2;
         S3 -> 2 S4; k2*S3-k3*S4
         k1 = 0.1; k2 = 0.2; k3 = 0.3
-        S1 = 10; S2 = 2.5; S3 = 3.4;
+        S1 = 10; S2 = 2.5; S3 = 3.4; S4 = 0
         """
         
 model = initializeTests('Test 3', modelStr)            
@@ -252,7 +252,7 @@ modelStr = """
         $S1 + S2 -> S3; k1*S1*S2;
         S3 -> 2 S4; k2*S3-k3*S4
         k2 = 0.2; k3 = 0.3
-        S1 = 10; S2 = 2.5; S3 = 3.4;
+        S1 = 10; S2 = 2.5; S3 = 3.4; S4 = 0
         """
  
 model = initializeTests('Test 5', modelStr)            
@@ -361,4 +361,100 @@ assertEqual (model.getParameterValue, 1, 2.2)
 assertEqual (model.getParameterValue, 'k3', 3.3)
 
 printReport()
+
+# ==================================================================
+
+modelStr = """  
+           compartment c1, c2, c3, c4;
+           
+           c1 = 1.1; c2 = 2.2; c3 = 3.3; c4 = 4.4
+           """
+ 
+model = initializeTests('Test 8', modelStr)            
+
+assertEqual (model.getNumCompartments, None, 4)
+assertEqual (model.getListOfCompartmentIds, None, ['c1', 'c2', 'c3', 'c4'])
+assertEqual (model.getCompartmentVolume, 'c1', 1.1)
+assertEqual (model.getCompartmentVolume, 'c2', 2.2)
+assertEqual (model.getCompartmentVolume, 2, 3.3)
+assertEqual (model.getCompartmentVolume, 'c4', 4.4)
+assertEqual (model.getCompartmentId, 0, 'c1')
+assertEqual (model.getCompartmentId, 2, 'c3')
+assertEqual (model.getNumInitialAssignments, None, 0)
+assertEqual (model.getNumFunctionDefinitions, None, 0)
+
+printReport()
+
+# ==================================================================
+
+modelStr = """  
+            S1 -> S2; k1*S3;
+            S2 -> S3; v;
+            
+            E0: at time > 10: k1 = k1/2
+           
+            k1 = 0.1; S1 = 10; S2 = 0; S3 = 0; v = 0        
+            """
+ 
+model = initializeTests('Test 9', modelStr)            
+
+assertEqual (model.getNumEvents, None, 1)
+assertEqual (model.getEventId, 0, 'E0')
+assertEqual (model.getEventTrigger, 0, 'time > 10')
+assertEqual (model.getNumEventAssignments, 0, 1)
+assertEqual (model.getEventVariable, [0, 0], 'k1')
+assertEqual (model.getEventAssignment, [0,0], 'k1 / 2')
+assertEqual (model.getEventString, 0, 'at time > 10 then { k1 = k1 / 2 }')
+
+printReport()
+
+# ==================================================================
+
+modelStr = """  
+            S1 -> S2; k1*S3;
+            S2 -> S3; v;
+                     
+            k1 = 0.1; S1 = 10; S2 = 0; S3 = 0; v = 0        
+            """
+ 
+model = initializeTests('Test 10', modelStr)            
+
+assertEqual (model.getNumModifiers, 0, 1)
+assertEqual (model.getListOfModifiers, 0, ['S3'])
+
+printReport()
+
+# ==================================================================
+
+modelStr = """  
+            function Hill (x, y)
+                x*2 + y
+            end
+            
+            S1 -> S2; k1*S3;
+            S2 -> S3; Hill (S2, S3)
+                     
+            k1 = 0.1; S1 = 10; S2 = 0; S3 = 0; v = 0        
+            """
+ 
+model = initializeTests('Test 10', modelStr)            
+
+assertEqual (model.getNumModifiers, 0, 1)
+assertEqual (model.getListOfModifiers, 0, ['S3'])
+
+assertEqual (model.getNumFunctionDefinitions, None, 1)
+assertEqual (model.getListOfFunctionIds, None, ['Hill'])
+assertEqual (model.getFunctionId, 0, 'Hill')
+assertEqual (model.getFunctionBody, 0, 'x * 2 + y')
+assertEqual (model.getNumArgumentsInUserFunction, 0, 2)
+assertEqual (model. getListOfArgumentsInUserFunction, 0, ['x', 'y'])
+
+printReport()
+
+
+# getCompartmentIdSpeciesIsIn
+# getSpeciesInitialConcentration
+
+
+
 

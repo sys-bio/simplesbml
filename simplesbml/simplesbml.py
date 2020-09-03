@@ -12,7 +12,7 @@ from math import isnan
 from re import sub
 import os
 
-# Version info is in __init__.py
+# Version info is inthe  __init__.py file
 
 def _isSBMLModel(obj):
   """
@@ -26,8 +26,8 @@ def _isSBMLModel(obj):
 
 def _checkSBMLDocument(document): 
   document.getErrorLog().getNumFailsWithSeverity(2)
-  #if (document.getNumErrors() > 0):
-  #  raise ValueError("Errors in SBML document")
+  if (document.getNumErrors() > 0):
+    raise ValueError("Errors in SBML document")
 
 class SbmlModel(object):
 

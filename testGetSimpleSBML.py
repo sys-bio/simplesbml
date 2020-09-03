@@ -39,21 +39,21 @@ print ('Number of floating species = ', model.getNumFloatingSpecies())
 print ('Number of floating species = ', model.getNumBoundarySpecies())
 print ('Number of reactions = ', model.getNumReactions())
 print ('Number of of function definitions = ', model.getNumFunctionDefinitions())
-print ('List of compartments: ', model.getListOfCompartments())
+print ('List of compartments: ', model.getListOfCompartmentIds())
 print ('List of ALL species: ', model.getListOfAllSpecies())
 print ('list of floating species = ', model.getListOfFloatingSpecies())
 print ('list of boundary species = ', model.getListOfBoundarySpecies())
-print ('List of reactions = ', model.getListOfReactions())
+print ('List of reactions = ', model.getListOfReactionIds())
 print ('List of rules = ', model.getListOfRules())
 print ('List of function definitions = ', model.getListOfFunctionIds())
 
 print ('Compartment values:')
-p = model.getListOfCompartments()
+p = model.getListOfCompartmentIds()
 for v in p:
     print (v, ': ', model.getCompartmentVolume (v))
     
 print ('Parameter values:')
-p = model.getListOfParameters()
+p = model.getListOfParameterIds()
 for v in p:
     print (v, ': ', model.getParameterValue (v))
     
@@ -66,13 +66,13 @@ for v in p:
        print (v, ': species value not set') 
  
 print ('Rate laws:')
-reactions = model.getListOfReactions()
+reactions = model.getListOfReactionIds()
 for v in reactions:
     print (v, ': ', model.getRateLaw (v))
     
 print ('-------------------------------------------------')
 print ('Reaction Details:')
-rs = model.getListOfReactions()
+rs = model.getListOfReactionIds()
 for rId in rs:
     print ('Reaction:', rId)
     print ('Number of reactants: ', model.getNumReactants (rId))
