@@ -262,7 +262,7 @@ methods that can be used to build a libSBML version of the model.</p>
 </div>
 <div class="section" id="examples-of-interrogating-an-existing-model">
 <h3>Examples of Interrogating an Existing Model<a class="headerlink" href="#examples-of-interrogating-an-existing-model" title="Permalink to this headline">¶</a></h3>
-<p>Verison 1.3.x has a set of new ‘get’ methods that allows a user to easily interrogate a model for its contents.:</p>
+<p>Verison 2.0.0 has a set of new ‘get’ methods that allows a user to easily interrogate a model for its contents.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">simplesbml</span>
 <span class="n">mymodel</span> <span class="o">=</span> <span class="n">loadFromFile</span> <span class="p">(</span><span class="s1">&#39;mymodel.xml&#39;</span><span class="p">)</span>  <span class="c1"># Load the model into a string variable</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">loadSBMLStr</span><span class="p">(</span><span class="n">mymodel</span><span class="p">)</span>
@@ -275,7 +275,7 @@ methods that can be used to build a libSBML version of the model.</p>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">loadSBMLStr</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getSBML</span><span class="p">())</span>
 
-<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Num compartmetns = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">())</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Num compartmetns = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getNumCompartmentIds</span><span class="p">())</span>
 <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Num parameters =&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getNumParameters</span><span class="p">())</span>
 <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Num species =&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getNumSpecies</span><span class="p">())</span>
 <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Num floating species = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getNumFloatingSpecies</span><span class="p">())</span>
@@ -285,8 +285,56 @@ methods that can be used to build a libSBML version of the model.</p>
 <span class="nb">print</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getListOfAllSpecies</span><span class="p">())</span>
 <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;list of floating species = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getListOfFloatingSpecies</span><span class="p">())</span>
 <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;list of boundary species = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getListOfBoundarySpecies</span><span class="p">())</span>
-<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;List of reactions = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getListOfReactions</span><span class="p">())</span>
-<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;List of rules = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getListOfRules</span><span class="p">())</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;List of reactions = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getListOfReactionIds</span><span class="p">())</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;List of rules = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getListOfRuleIds</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Here is an example script that uses simplesbml to create a stoichiometry matrix for a model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tellurium</span> <span class="k">as</span> <span class="nn">te</span><span class="o">,</span> <span class="nn">simplesbml</span><span class="o">,</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">te</span><span class="o">.</span><span class="n">loada</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">S0 + S3 -&gt; S2; k0*S0*S3;</span>
+<span class="s2">S3 + S2 -&gt; S0; k1*S3*S2;</span>
+<span class="s2">S5 -&gt; S2 + S4; k2*S5;</span>
+<span class="s2">S0 + S1 -&gt; S3; k3*S0*S1;</span>
+<span class="s2">S5 -&gt; S0 + S4; k4*S5;</span>
+<span class="s2">S0 -&gt; S5; k5*S0;</span>
+<span class="s2">S1 + S1 -&gt; S5; k6*S1*S1;</span>
+<span class="s2">S3 + S5 -&gt; S1; k7*S3*S5;</span>
+<span class="s2">S1 -&gt; $S4 + S4; k8*S1;</span>
+
+<span class="s2">S0 = 0; S1 = 0; S2 = 0; S3 = 0; S4 = 0; S5 = 0;</span>
+<span class="s2">k0 = 0; k1 = 0; k2 = 0; k3 = 0; k4 = 0</span>
+<span class="s2">k5 = 0; k6 = 0; k7 = 0; k8 = 0</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">loadSBMLStr</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getSBML</span><span class="p">())</span>
+
+<span class="c1"># Allocate space for the stoichiometry matrix</span>
+<span class="n">stoich</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">model</span><span class="o">.</span><span class="n">getNumFloatingSpecies</span><span class="p">(),</span> <span class="n">model</span><span class="o">.</span><span class="n">getNumReactions</span><span class="p">()))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">getNumFloatingSpecies</span><span class="p">()):</span>
+    <span class="n">floatingSpeciesId</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getNthFloatingSpeciesId</span> <span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">getNumReactions</span><span class="p">()):</span>
+        <span class="n">productStoichiometry</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">reactantStoichiometry</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">numProducts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getNumProducts</span> <span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k1</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">numProducts</span><span class="p">):</span>
+            <span class="n">productId</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getProduct</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">floatingSpeciesId</span> <span class="o">==</span> <span class="n">productId</span><span class="p">):</span>
+               <span class="n">productStoichiometry</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">getProductStoichiometry</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k1</span><span class="p">)</span>
+
+        <span class="n">numReactants</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getNumReactants</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k1</span> <span class="ow">in</span> <span class="nb">range</span> <span class="p">(</span><span class="n">numReactants</span><span class="p">):</span>
+            <span class="n">reactantId</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getReactant</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">floatingSpeciesId</span> <span class="o">==</span> <span class="n">reactantId</span><span class="p">):</span>
+               <span class="n">reactantStoichiometry</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">getReactantStoichiometry</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k1</span><span class="p">)</span>
+
+        <span class="n">st</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">productStoichiometry</span> <span class="o">-</span> <span class="n">reactantStoichiometry</span><span class="p">)</span>
+        <span class="n">stoich</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">st</span>
+
+<span class="nb">print</span> <span class="p">(</span><span class="n">stoich</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -530,8 +578,8 @@ of a user function or its index in the list of user fucntions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="simplesbml.SbmlModel.getListOfCompartments">
-<code class="sig-name descname">getListOfCompartments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfCompartments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfCompartments" title="Permalink to this definition">¶</a></dt>
+<dt id="simplesbml.SbmlModel.getListOfCompartmentIds">
+<code class="sig-name descname">getListOfCompartmentIds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfCompartmentIds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfCompartmentIds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of compartment Ids</p>
 </dd></dl>
 
@@ -554,8 +602,8 @@ of a user function or its index in the list of user fucntions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="simplesbml.SbmlModel.getListOfParameters">
-<code class="sig-name descname">getListOfParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfParameters" title="Permalink to this definition">¶</a></dt>
+<dt id="simplesbml.SbmlModel.getListOfParameterIds">
+<code class="sig-name descname">getListOfParameterIds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfParameterIds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfParameterIds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of all global parameter Ids in the model.</p>
 </dd></dl>
 
@@ -566,8 +614,8 @@ of a user function or its index in the list of user fucntions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="simplesbml.SbmlModel.getListOfRules">
-<code class="sig-name descname">getListOfRules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfRules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfRules" title="Permalink to this definition">¶</a></dt>
+<dt id="simplesbml.SbmlModel.getListOfRuleIds">
+<code class="sig-name descname">getListOfRuleIds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfRuleIds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfRuleIds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of Ids for the rules</p>
 </dd></dl>
 
@@ -916,7 +964,7 @@ and prints all errors and warnings.</p>
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2015, 2020, Caroline Cannistra
+        &copy; Copyright 2015, 2020, Caroline Cannistra, Kyle Medley, Herbert Sauro
 
     </p>
   </div>
