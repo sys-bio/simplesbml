@@ -308,6 +308,7 @@ assertEqual (model.getProduct, ['_J1', 0], 'S4')
 assertEqual (model.getReactantStoichiometry, ['_J1', 0], 1)
 assertEqual (model.getProductStoichiometry, ['_J1', 0], 2)
       
+assertEqual (model.getListOfRuleIds, None, ['k1'])
 assertEqual (model.getRuleId, 0, 'k1')
 assertEqual (model.getRuleRightSide, 0, '7.8')
 assertEqual (model.getRuleType, 0, 'Assignment rule')

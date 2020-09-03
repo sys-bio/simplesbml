@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>simplesbml &mdash; SimpleSBML 1.3.3 documentation</title>
+  <title>simplesbml &mdash; SimpleSBML 2.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.3.3
+                2.0.0
               </div>
             
           
@@ -162,7 +162,7 @@
 <span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">sub</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="c1"># Version info is in __init__.py</span>
+<span class="c1"># Version info is inthe  __init__.py file</span>
 
 <span class="k">def</span> <span class="nf">_isSBMLModel</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;</span>
@@ -175,6 +175,7 @@
     <span class="k">return</span> <span class="kc">False</span>
 
 <span class="k">def</span> <span class="nf">_checkSBMLDocument</span><span class="p">(</span><span class="n">document</span><span class="p">):</span> 
+  <span class="n">document</span><span class="o">.</span><span class="n">getErrorLog</span><span class="p">()</span><span class="o">.</span><span class="n">getNumFailsWithSeverity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">document</span><span class="o">.</span><span class="n">getNumErrors</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Errors in SBML document&quot;</span><span class="p">)</span>
 
@@ -642,6 +643,13 @@
            <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">alist</span></div>
     
+
+<div class="viewcode-block" id="SbmlModel.getCompartmentId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getCompartmentId">[docs]</a>    <span class="k">def</span> <span class="nf">getCompartmentId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the indexth compartment from the list of compartments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfCompartments</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="SbmlModel.getCompartmentVolume"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getCompartmentVolume">[docs]</a>    <span class="k">def</span> <span class="nf">getCompartmentVolume</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        **Parameters**</span>
@@ -671,13 +679,13 @@
     
 <div class="viewcode-block" id="SbmlModel.getNthFloatingSpeciesId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNthFloatingSpeciesId">[docs]</a>    <span class="k">def</span> <span class="nf">getNthFloatingSpeciesId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the Id of the nth floating speces</span>
+<span class="sd">        Returns the Id of the nth floating species</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfFloatingSpecies</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SbmlModel.getNthBoundarySpeciesId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNthBoundarySpeciesId">[docs]</a>    <span class="k">def</span> <span class="nf">getNthBoundarySpeciesId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the Id of the nth boundary speces</span>
+<span class="sd">        Returns the Id of the nth boundary species</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfBoundarySpecies</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span></div>
 
@@ -768,7 +776,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-           <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isSetBoundaryCondition</span><span class="p">():</span>
+           <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">getBoundaryCondition</span><span class="p">():</span>
               <span class="k">return</span> <span class="kc">False</span>
            <span class="k">else</span><span class="p">:</span>
               <span class="k">return</span> <span class="kc">True</span>
@@ -781,7 +789,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-           <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isSetBoundaryCondition</span><span class="p">():</span>
+           <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">getBoundaryCondition</span><span class="p">():</span>
               <span class="k">return</span> <span class="kc">True</span>
            <span class="k">else</span><span class="p">:</span>
               <span class="k">return</span> <span class="kc">False</span>
@@ -807,7 +815,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getSpecies</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">isSetInitialConcentration</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">getInitialConcentration</span><span class="p">():</span>
                 <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -827,9 +835,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getListOfBoundarySpecies</span><span class="p">())</span></div>
     
-    <span class="c1">#def getParameter(self, param_id):</span>
-    <span class="c1">#    return self.model.getParameter(param_id)</span>
-
 <div class="viewcode-block" id="SbmlModel.getListOfParameters"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfParameters">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all global parameter Ids in the model.</span>
@@ -841,6 +846,11 @@
             <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
         <span class="k">return</span> <span class="n">alist</span></div>
 
+<div class="viewcode-block" id="SbmlModel.getParameterId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getParameterId">[docs]</a>    <span class="k">def</span> <span class="nf">getParameterId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the indexth parameter from the list of parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfParameters</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span></div>
     
 <div class="viewcode-block" id="SbmlModel.isParameterValueSet"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isParameterValueSet">[docs]</a>    <span class="k">def</span> <span class="nf">isParameterValueSet</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -868,11 +878,15 @@
 <span class="sd">        Example: value = model.getParameterValue (&#39;k1&#39;)       </span>
 <span class="sd">        &quot;&quot;&quot;</span>      
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getParameter</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isSetValue</span><span class="p">():</span>
-           <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
-        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Parameter does not exist&#39;</span><span class="p">)</span>      </div>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isSetValue</span><span class="p">():</span>
+              <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
+           <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Parameter does not exist&#39;</span><span class="p">)</span>      </div>
         
-<div class="viewcode-block" id="SbmlModel.getListOfReactions"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfReactions">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfReactions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SbmlModel.getListOfReactionIds"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getListOfReactionIds">[docs]</a>    <span class="k">def</span> <span class="nf">getListOfReactionIds</span> <span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all reaction Ids.</span>
 <span class="sd">        &quot;&quot;&quot;</span>       
@@ -883,6 +897,12 @@
             <span class="n">alist</span><span class="o">.</span><span class="n">append</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getId</span><span class="p">())</span>             
         <span class="k">return</span> <span class="n">alist</span></div>
     
+<div class="viewcode-block" id="SbmlModel.getNthReactionId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNthReactionId">[docs]</a>    <span class="k">def</span> <span class="nf">getNthReactionId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Id of the nth reaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getListOfReactionIds</span><span class="p">()[</span><span class="n">index</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="SbmlModel.getNumReactants"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getNumReactants">[docs]</a>    <span class="k">def</span> <span class="nf">getNumReactants</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">         Returns the number of reactants in the reaction given by the Id argument.</span>
@@ -1036,7 +1056,9 @@
 
 <span class="sd">        Example: rule = model.getRuleId (2)</span>
 <span class="sd">        &quot;&quot;&quot;</span>         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
+        <span class="n">rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rule</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rule</span><span class="o">.</span><span class="n">getId</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SbmlModel.getRuleRightSide"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getRuleRightSide">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleRightSide</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1046,7 +1068,9 @@
 
 <span class="sd">        Example: formula = model.getRuleRightSide (0)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span><span class="o">.</span><span class="n">getFormula</span><span class="p">()</span></div>
+        <span class="n">rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rule</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rule</span><span class="o">.</span><span class="n">getFormula</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SbmlModel.getRuleType"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getRuleType">[docs]</a>    <span class="k">def</span> <span class="nf">getRuleType</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1057,15 +1081,60 @@
 <span class="sd">        Example: ruleStr = model.getRuleType (0)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">myRule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span>
-        <span class="n">t1</span> <span class="o">=</span> <span class="n">myRule</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_RATE_RULE</span><span class="p">:</span>
-           <span class="k">return</span> <span class="s1">&#39;ODE (or rate) rule&#39;</span> 
-        <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ASSIGNMENT_RULE</span><span class="p">:</span>
-           <span class="k">return</span> <span class="s1">&#39;Assignment rule&#39;</span> 
-        <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ALGEBRAIC_RULE</span><span class="p">:</span>
-           <span class="k">return</span> <span class="s1">&#39;Algebraic rule&#39;</span> 
-        <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Unknown rule in SBML model&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">myRule</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="n">t1</span> <span class="o">=</span> <span class="n">myRule</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span>
+           <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_RATE_RULE</span><span class="p">:</span>
+              <span class="k">return</span> <span class="s1">&#39;ODE (or rate) rule&#39;</span> 
+           <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ASSIGNMENT_RULE</span><span class="p">:</span>
+              <span class="k">return</span> <span class="s1">&#39;Assignment rule&#39;</span> 
+           <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ALGEBRAIC_RULE</span><span class="p">:</span>
+              <span class="k">return</span> <span class="s1">&#39;Algebraic rule&#39;</span> 
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;Unknown rule in SBML model&#39;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="SbmlModel.isRuleType_Assignment"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isRuleType_Assignment">[docs]</a>    <span class="k">def</span> <span class="nf">isRuleType_Assignment</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true the rule is an assignemnt type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myRule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">myRule</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="n">t1</span> <span class="o">=</span> <span class="n">myRule</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span>
+           <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ASSIGNMENT_RULE</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">True</span>
+           <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">False</span> 
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">return</span> <span class="kc">None</span></div>
+           <span class="c1">#raise Exception (&#39;The rule: &#39; + str (rule) + &#39;, does not exist&#39;) </span>
+
+<div class="viewcode-block" id="SbmlModel.isRuleType_Rate"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isRuleType_Rate">[docs]</a>    <span class="k">def</span> <span class="nf">isRuleType_Rate</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true the rule is an rate rule (ode) type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myRule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">myRule</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="n">t1</span> <span class="o">=</span> <span class="n">myRule</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span>
+           <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_RATE_RULE</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">True</span>
+           <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">False</span> 
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;The rule: &#39;</span> <span class="o">+</span> <span class="nb">str</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, does not exist&#39;</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="SbmlModel.isRuleType_Algebraic"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.isRuleType_Algebraic">[docs]</a>    <span class="k">def</span> <span class="nf">isRuleType_Algebraic</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true the rule is an algebraic rule type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myRule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getRule</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">myRule</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="n">t1</span> <span class="o">=</span> <span class="n">myRule</span><span class="o">.</span><span class="n">getTypeCode</span><span class="p">()</span>
+           <span class="k">if</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBML_ALGEBRAIC_RULE</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">True</span>
+           <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="kc">False</span> 
+        <span class="k">else</span><span class="p">:</span>
+           <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;The rule: &#39;</span> <span class="o">+</span> <span class="nb">str</span> <span class="p">(</span><span class="n">rule</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, does not exist&#39;</span><span class="p">)</span> </div>
+
+    <span class="c1">#  ----------------------- EVENTS -------------------------</span>
 <div class="viewcode-block" id="SbmlModel.getEventId"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.getEventId">[docs]</a>    <span class="k">def</span> <span class="nf">getEventId</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the Id for the indexth event</span>
@@ -1219,15 +1288,15 @@
 
 <div class="viewcode-block" id="SbmlModel.toSBML"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel.toSBML">[docs]</a>    <span class="k">def</span> <span class="nf">toSBML</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the model in SBML format as a string.  Also checks model consistency</span>
-<span class="sd">       and prints all errors and warnings.</span>
+<span class="sd">        and prints all errors and warnings.</span>
 
-<span class="sd">       Example: print (model.toSBML())</span>
-<span class="sd">       &quot;&quot;&quot;</span>
-
+<span class="sd">        Example: print (model.toSBML())</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">setConsistencyChecks</span><span class="p">(</span><span class="n">libsbml</span><span class="o">.</span><span class="n">LIBSBML_CAT_UNITS_CONSISTENCY</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">checkConsistency</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">getSeverityAsString</span><span class="p">(),</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">getMessage</span><span class="p">())</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
+               <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">getSeverityAsString</span><span class="p">(),</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">getMessage</span><span class="p">())</span> 
 
         <span class="k">return</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">writeSBMLToString</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document</span><span class="p">)</span></div>
 

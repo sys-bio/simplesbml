@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to the SimpleSBML documentation! &mdash; SimpleSBML 1.3.3 documentation</title>
+  <title>Welcome to the SimpleSBML documentation for Version 2.0 &mdash; SimpleSBML 2.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.3.3
+                2.0.0
               </div>
             
           
@@ -86,7 +86,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to the SimpleSBML documentation!</a><ul>
+<li><a class="reference internal" href="#">Welcome to the SimpleSBML documentation for Version 2.0</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#examples">Examples</a><ul>
 <li><a class="reference internal" href="#examples-of-interrogating-an-existing-model">Examples of Interrogating an Existing Model</a></li>
@@ -141,7 +141,7 @@
     
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Welcome to the SimpleSBML documentation!</li>
+      <li>Welcome to the SimpleSBML documentation for Version 2.0</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -160,8 +160,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <span class="target" id="module-simplesbml"></span><div class="section" id="welcome-to-the-simplesbml-documentation">
-<h1>Welcome to the SimpleSBML documentation!<a class="headerlink" href="#welcome-to-the-simplesbml-documentation" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="module-simplesbml"></span><div class="section" id="welcome-to-the-simplesbml-documentation-for-version-2-0">
+<h1>Welcome to the SimpleSBML documentation for Version 2.0<a class="headerlink" href="#welcome-to-the-simplesbml-documentation-for-version-2-0" title="Permalink to this headline">¶</a></h1>
 <p>This page describes the SimpleSBML package and its contents.  To install
 SimpleSBML, go to
 <a class="reference external" href="https://github.com/sys-bio/simplesbml">https://github.com/sys-bio/simplesbml</a>
@@ -265,15 +265,15 @@ methods that can be used to build a libSBML version of the model.</p>
 <p>Verison 1.3.x has a set of new ‘get’ methods that allows a user to easily interrogate a model for its contents.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">simplesbml</span>
 <span class="n">mymodel</span> <span class="o">=</span> <span class="n">loadFromFile</span> <span class="p">(</span><span class="s1">&#39;mymodel.xml&#39;</span><span class="p">)</span>  <span class="c1"># Load the model into a string variable</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">SbmlModel</span><span class="p">(</span><span class="n">strSbml</span><span class="o">=</span><span class="n">mymodel</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">loadSBMLStr</span><span class="p">(</span><span class="n">mymodel</span><span class="p">)</span>
 
 <span class="c1"># Or:</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">SbmlModel</span><span class="p">(</span><span class="n">strFile</span><span class="o">=</span><span class="s1">&#39;mymodel.xml&#39;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">loadSBMLFile</span><span class="p">(</span><span class="s1">&#39;mymodel.xml&#39;</span><span class="p">)</span>
 
 <span class="c1"># Or of you&#39;re using the Tellurium package:</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">SbmlModel</span><span class="p">(</span><span class="n">strSbml</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">getSBML</span><span class="p">())</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">simplesbml</span><span class="o">.</span><span class="n">loadSBMLStr</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">getSBML</span><span class="p">())</span>
 
 <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Num compartmetns = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getNumCompartments</span><span class="p">())</span>
 <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;Num parameters =&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">getNumParameters</span><span class="p">())</span>
@@ -420,6 +420,12 @@ Otherwise, <em>amt</em> is the initial amount of species in moles.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="simplesbml.SbmlModel.getCompartmentId">
+<code class="sig-name descname">getCompartmentId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getCompartmentId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getCompartmentId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the indexth compartment from the list of compartments</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="simplesbml.SbmlModel.getCompartmentIdSpeciesIsIn">
 <code class="sig-name descname">getCompartmentIdSpeciesIsIn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">speciesId</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getCompartmentIdSpeciesIsIn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getCompartmentIdSpeciesIsIn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the compartment Id that the species givenin th argument is in.</p>
@@ -554,8 +560,8 @@ of a user function or its index in the list of user fucntions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="simplesbml.SbmlModel.getListOfReactions">
-<code class="sig-name descname">getListOfReactions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfReactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfReactions" title="Permalink to this definition">¶</a></dt>
+<dt id="simplesbml.SbmlModel.getListOfReactionIds">
+<code class="sig-name descname">getListOfReactionIds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getListOfReactionIds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getListOfReactionIds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of all reaction Ids.</p>
 </dd></dl>
 
@@ -583,13 +589,19 @@ object of the sbmlModel.</p>
 <dl class="py method">
 <dt id="simplesbml.SbmlModel.getNthBoundarySpeciesId">
 <code class="sig-name descname">getNthBoundarySpeciesId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getNthBoundarySpeciesId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getNthBoundarySpeciesId" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Id of the nth boundary speces</p>
+<dd><p>Returns the Id of the nth boundary species</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="simplesbml.SbmlModel.getNthFloatingSpeciesId">
 <code class="sig-name descname">getNthFloatingSpeciesId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getNthFloatingSpeciesId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getNthFloatingSpeciesId" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Id of the nth floating speces</p>
+<dd><p>Returns the Id of the nth floating species</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplesbml.SbmlModel.getNthReactionId">
+<code class="sig-name descname">getNthReactionId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getNthReactionId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getNthReactionId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Id of the nth reaction</p>
 </dd></dl>
 
 <dl class="py method">
@@ -698,6 +710,12 @@ of a user function or its index.</p>
 <dt id="simplesbml.SbmlModel.getNumSpecies">
 <code class="sig-name descname">getNumSpecies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getNumSpecies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getNumSpecies" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the number of all species in the current model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplesbml.SbmlModel.getParameterId">
+<code class="sig-name descname">getParameterId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.getParameterId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.getParameterId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the indexth parameter from the list of parameter</p>
 </dd></dl>
 
 <dl class="py method">
@@ -846,6 +864,24 @@ of a user function or its index.</p>
 <code class="sig-name descname">isParameterValueSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Id</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.isParameterValueSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.isParameterValueSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns true if the parameter has been assigned a value</p>
 <p>Example: if model.isParameterValueSet (‘k1’):</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplesbml.SbmlModel.isRuleType_Algebraic">
+<code class="sig-name descname">isRuleType_Algebraic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rule</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.isRuleType_Algebraic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.isRuleType_Algebraic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true the rule is an algebraic rule type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplesbml.SbmlModel.isRuleType_Assignment">
+<code class="sig-name descname">isRuleType_Assignment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rule</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.isRuleType_Assignment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.isRuleType_Assignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true the rule is an assignemnt type</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="simplesbml.SbmlModel.isRuleType_Rate">
+<code class="sig-name descname">isRuleType_Rate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rule</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simplesbml.html#SbmlModel.isRuleType_Rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplesbml.SbmlModel.isRuleType_Rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true the rule is an rate rule (ode) type</p>
 </dd></dl>
 
 <dl class="py method">

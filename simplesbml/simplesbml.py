@@ -12,7 +12,7 @@ from math import isnan
 from re import sub
 import os
 
-# Version info is inthe  __init__.py file
+# Version info is in __init__.py
 
 def _isSBMLModel(obj):
   """
@@ -28,6 +28,20 @@ def _checkSBMLDocument(document):
   document.getErrorLog().getNumFailsWithSeverity(2)
   if (document.getNumErrors() > 0):
     raise ValueError("Errors in SBML document")
+
+
+# Some convenience methods    
+def loadSBMLStr (sbmlStr):
+    """
+    Load an SBML model in the form of a string and return an instance to SBMLModel
+    """
+    return SbmlModel (sbmlStr=sbmlStr)
+
+def loadSBMLFile (sbmlFile):
+    """
+    Load an SBML model from a file and return an instance to SBMLModel
+    """
+    return SbmlModel (sbmlFile=sbmlFile)
 
 class SbmlModel(object):
 
@@ -98,7 +112,7 @@ class SbmlModel(object):
 
             _checkSBMLDocument(self.document)
             self.model = self.document.getModel()
-             
+    
     def _check(self, value, message):
         if value == None:
             raise SystemExit('LibSBML returned a null value trying to ' + \
@@ -482,7 +496,7 @@ class SbmlModel(object):
     #def getSpecies(self, species_id):      
     #    return self.model.getSpecies(species_id)
 
-    def getListOfCompartments(self):
+    def getListOfCompartmentIds(self):
         """
         Returns a list of compartment Ids
         """
@@ -498,7 +512,7 @@ class SbmlModel(object):
         """
         Returns the indexth compartment from the list of compartments
         """
-        return self.getListOfCompartments()[index]
+        return self.getListOfCompartmentIds()[index]
 
     def getCompartmentVolume (self, Id):
         """
@@ -685,7 +699,7 @@ class SbmlModel(object):
         """
         return len (self.getListOfBoundarySpecies())
     
-    def getListOfParameters(self):
+    def getListOfParameterIds(self):
         """
         Returns a list of all global parameter Ids in the model.
         """
@@ -700,7 +714,7 @@ class SbmlModel(object):
         """
         Returns the indexth parameter from the list of parameter
         """
-        return self.getListOfParameters()[index]
+        return self.getListOfParameterIds()[index]
     
     def isParameterValueSet (self, Id):
         """
@@ -847,8 +861,11 @@ class SbmlModel(object):
         Example: stInt = model.getReactantStoichiometry ('J1', 0)
         """         
         ra = self.model.getReaction(reactionId)
-        sr = ra.getReactant(reactantIndex)
-        return sr.getStoichiometry ()
+        if ra != None:
+           sr = ra.getReactant(reactantIndex)
+           return sr.getStoichiometry ()
+        else:
+           raise Exception ('Reaction:' + reactionId + ' does not exist') 
 
     def getProductStoichiometry (self, reactionId, productIndex):
         """
@@ -867,8 +884,11 @@ class SbmlModel(object):
         Example: stInt = model.getProductStoichiometry ('J1', 0)
         """
         ra = self.model.getReaction(reactionId)
-        sr = ra.getProduct(productIndex)
-        return sr.getStoichiometry ()
+        if ra != None:
+           sr = ra.getProduct(productIndex)
+           return sr.getStoichiometry ()
+        else:
+           raise Exception ('Reaction:' + reactionId + ' does not exist') 
         
     def getNumModifiers (self, reactionId):
         """
@@ -884,12 +904,12 @@ class SbmlModel(object):
         reaction = self.model.getReaction (reactionId)
         if reaction != None:
            for i in range (reaction.getNumModifiers()):
-               alist.append (reaction.getModifer (0))
+               alist.append (reaction.getModifier (0).getSpecies())
            return alist
         else:
            raise Exception ('No such reaction can be found:', reactionId)
  
-    def getListOfRules(self):
+    def getListOfRuleIds(self):
         """
         Returns a list of Ids for the rules
         """ 
@@ -1114,27 +1134,6 @@ class SbmlModel(object):
         for i in range (myFunc.getNumArguments()):
             alist.append (libsbml.formulaToL3String(myFunc.getArgument(i)))
         return alist
-
-    # def getReaction(self, rxn_id):
-    #     return self.model.getReaction(rxn_id)
-
-    # def getCompartment(self, comp_id):
-    #     return self.model.getCompartment(comp_id)
-
-    # def getListOfEvents(self):
-    #     return self.model.getListOfEvents()
-
-    # def getEvent(self, event_id):
-    #     return self.model.getEvent(event_id)
-
-    # def getRule(self, var):
-    #     return self.model.getRule(var)
-
-    # def getInitialAssignment(self, var):
-    #     return self.model.getInitialAssignment(var)
-
-    # def getListOfInitialAssignments(self):
-    #     return self.model.getListOfInitialAssignments()
 
     def toSBML(self):
         """Returns the model in SBML format as a string.  Also checks model consistency

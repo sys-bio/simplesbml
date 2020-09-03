@@ -5,9 +5,9 @@
 
 .. module:: simplesbml
 
-========================================
-Welcome to the SimpleSBML documentation!
-========================================
+=======================================================
+Welcome to the SimpleSBML documentation for Version 2.0
+=======================================================
 
 This page describes the SimpleSBML package and its contents.  To install
 SimpleSBML, go to
@@ -122,15 +122,15 @@ Verison 1.3.x has a set of new 'get' methods that allows a user to easily interr
 
     import simplesbml
     mymodel = loadFromFile ('mymodel.xml')  # Load the model into a string variable
-    model = simplesbml.SbmlModel(strSbml=mymodel)
+    model = simplesbml.loadSBMLStr(mymodel)
 
     # Or:
 
-    model = simplesbml.SbmlModel(strFile='mymodel.xml')
+    model = simplesbml.loadSBMLFile('mymodel.xml')
 
     # Or of you're using the Tellurium package:
 
-    model = simplesbml.SbmlModel(strSbml=r.getSBML())    
+    model = simplesbml.loadSBMLStr(r.getSBML())    
   
     print ('Num compartmetns = ', s.getNumCompartments())
     print ('Num parameters =', s.getNumParameters())

@@ -12,8 +12,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='simplesbml',
-      version='1.3.3',
-      description='A simplified interface for constructing and accessing SBML docs.',
+      version='2.0.0',
+      description='A simplified interface for constructing and accessing SBML docs. Version 2.0',
       author='Caroline Cannistra, Kyle Medley, Hebrert Sauro',
       author_email='tellurium-discuss@googlegroups.com',
       url='http://simplesbml.readthedocs.io/en/latest/',
