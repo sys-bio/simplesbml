@@ -204,6 +204,6 @@ Classes and Methods
 -------------------
 
 .. automodule:: simplesbml
+   :members:
+   :member-order: bysource
 
-.. autoclass:: SbmlModel
-   :members: 

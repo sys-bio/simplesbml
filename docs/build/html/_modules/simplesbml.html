@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>simplesbml &mdash; SimpleSBML 2.0.0 documentation</title>
+  <title>simplesbml &mdash; SimpleSBML 2.0.1 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                2.0.0
+                2.0.1
               </div>
             
           
@@ -181,17 +181,17 @@
 
 
 <span class="c1"># Some convenience methods    </span>
-<span class="k">def</span> <span class="nf">loadSBMLStr</span> <span class="p">(</span><span class="n">sbmlStr</span><span class="p">):</span>
+<div class="viewcode-block" id="loadSBMLStr"><a class="viewcode-back" href="../index.html#simplesbml.loadSBMLStr">[docs]</a><span class="k">def</span> <span class="nf">loadSBMLStr</span> <span class="p">(</span><span class="n">sbmlStr</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load an SBML model in the form of a string and return an instance to SBMLModel</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">SbmlModel</span> <span class="p">(</span><span class="n">sbmlStr</span><span class="o">=</span><span class="n">sbmlStr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SbmlModel</span> <span class="p">(</span><span class="n">sbmlStr</span><span class="o">=</span><span class="n">sbmlStr</span><span class="p">)</span></div>
 
-<span class="k">def</span> <span class="nf">loadSBMLFile</span> <span class="p">(</span><span class="n">sbmlFile</span><span class="p">):</span>
+<div class="viewcode-block" id="loadSBMLFile"><a class="viewcode-back" href="../index.html#simplesbml.loadSBMLFile">[docs]</a><span class="k">def</span> <span class="nf">loadSBMLFile</span> <span class="p">(</span><span class="n">sbmlFile</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load an SBML model from a file and return an instance to SBMLModel</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">SbmlModel</span> <span class="p">(</span><span class="n">sbmlFile</span><span class="o">=</span><span class="n">sbmlFile</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SbmlModel</span> <span class="p">(</span><span class="n">sbmlFile</span><span class="o">=</span><span class="n">sbmlFile</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SbmlModel"><a class="viewcode-back" href="../index.html#simplesbml.SbmlModel">[docs]</a><span class="k">class</span> <span class="nc">SbmlModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
@@ -1302,7 +1302,7 @@
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toSBML</span><span class="p">()</span></div>
 
-<span class="k">def</span> <span class="nf">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+<div class="viewcode-block" id="writeCode"><a class="viewcode-back" href="../index.html#simplesbml.writeCode">[docs]</a><span class="k">def</span> <span class="nf">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns a string containing calls to SimpleSBML functions that reproduce</span>
 <span class="sd">    the model contained in the SBMLDocument *doc* in an sbmlModel object.&quot;&quot;&quot;</span>
 
@@ -1476,9 +1476,9 @@
     <span class="n">commands</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="s1">&#39;\((, )+&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
     <span class="n">commands</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="s1">&#39;(, )+\)&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
     <span class="n">commands</span> <span class="o">=</span> <span class="n">sub</span><span class="p">(</span><span class="s1">&#39;(, )+&#39;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="n">commands</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">commands</span>
+    <span class="k">return</span> <span class="n">commands</span></div>
 
-<span class="k">def</span> <span class="nf">writeCodeFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="writeCodeFromFile"><a class="viewcode-back" href="../index.html#simplesbml.writeCodeFromFile">[docs]</a><span class="k">def</span> <span class="nf">writeCodeFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Reads the file saved under *filename* as an SBML format model and</span>
 <span class="sd">    returns a string containing calls to SimpleSBML functions that reproduce</span>
 <span class="sd">    the model in an sbmlModel object.&quot;&quot;&quot;</span>
@@ -1487,16 +1487,16 @@
     <span class="n">doc</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readSBMLFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">getNumErrors</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">getError</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div>
 
-<span class="k">def</span> <span class="nf">writeCodeFromString</span><span class="p">(</span><span class="n">sbmlstring</span><span class="p">):</span>
+<div class="viewcode-block" id="writeCodeFromString"><a class="viewcode-back" href="../index.html#simplesbml.writeCodeFromString">[docs]</a><span class="k">def</span> <span class="nf">writeCodeFromString</span><span class="p">(</span><span class="n">sbmlstring</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Reads *sbmlstring* as an SBML format model and</span>
 <span class="sd">    returns a string containing calls to SimpleSBML functions that reproduce</span>
 <span class="sd">    the model in an sbmlModel object.&quot;&quot;&quot;</span>
 
     <span class="n">reader</span> <span class="o">=</span> <span class="n">libsbml</span><span class="o">.</span><span class="n">SBMLReader</span><span class="p">()</span>
     <span class="n">doc</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">readSBMLFromString</span><span class="p">(</span><span class="n">sbmlstring</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">writeCode</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
