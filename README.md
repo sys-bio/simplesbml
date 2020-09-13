@@ -1,15 +1,12 @@
  <table style="width:100%">
   <tr>
-    <td><img src="https://codecov.io/gh/sys-bio/simplesbml/branch/master/graph/badge.svg" /></td>
     <td><img src="https://img.shields.io/badge/License-MIT-yellow.svg" /></td>
-    <td><img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/w/sys-bio/simplesbml"></td>
     <td><img alt="Read the Docs" src="https://img.shields.io/readthedocs/simplesbml"></td>
     <td><img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/simplesbml"></td>
+    <td><img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/sys-bio/simplesbml"></td>
+    <td><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/simplesbml"></td>
   </tr>
 </table> 
-
-<a href="https://codecov.io/gh/sys-bio/simplesbml">
-</a>
 
 # simplesbml
 
