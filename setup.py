@@ -6,7 +6,7 @@ Created on Thu Feb 12 16:19:07 2015, 2020
 """
 
 from setuptools import setup
-import os.path
+import os.path, codecs
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
