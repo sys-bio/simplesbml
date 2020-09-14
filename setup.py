@@ -39,7 +39,7 @@ setup(name='simplesbml',
       long_description_content_type='text/markdown',     
       install_requires=['tesbml>=5.15.0'],
       license='MIT',
-      packages=['simplesbml'],
+      packages=['simplesbml', 'tests'],
       include_package_data=True,
       classifiers=[
        'License :: OSI Approved :: MIT License',
