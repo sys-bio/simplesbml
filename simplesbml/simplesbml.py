@@ -14,6 +14,9 @@ import os
 
 # Version info is in __init__.py
 
+def runUnitTests():
+    print (os.getcwd())
+
 def _isSBMLModel(obj):
   """
   Tests if object is a libsbml model
