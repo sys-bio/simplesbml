@@ -11,7 +11,7 @@ from .simplesbml import SbmlModel
 from .simplesbml import loadSBMLStr
 from .simplesbml import loadSBMLFile
 
-__version__ = '2.0.4'
+from simplesbml._version import __version__
 
 
 
