@@ -197,7 +197,11 @@ Here is an example script that uses simplesbml to create a stoichiometry matrix 
 Tests and Examples
 -------------------
 
-Two test files can be found in the tests folder. The runTest.py is the more formal testing file. It was decided not to use the Python unittest due to its limitations and pyTest simply made the code unmanagable. A simple test system was therefore created. To run the tests just execute runTests.py. Make sure you have libsbml installed or are running the code under Tellurium.
+Two test files can be found in the tests folder. The runTest.py is the more formal testing file. It was decided not to use the Python unittest due to its limitations and pyTest simply made the code unmanagable. A simple test system was therefore created. To run the tests just execute runTests.py or more simply::
+
+    simplesbml.tests.run()
+
+Make sure you have libsbml installed or are running the code under Tellurium.
 
 -------------------
 Classes and Methods
