@@ -5,7 +5,14 @@ Created on Tue Sep  1 22:50:46 2020
 @author: hsauro
 """
 
-import tellurium as _te
+try:
+   import tellurium as _te
+except:
+   print("You will need to install tellurium if you want to run the tests")
+   print ("We use tellurium to define the test models")
+   import sys
+   sys.exit()
+
 import simplesbml as _simplesbml
 
 _testCount = 0
