@@ -37,15 +37,16 @@ setup(name='simplesbml',
       url='http://simplesbml.readthedocs.io/en/latest/',
       long_description=long_description,
       long_description_content_type='text/markdown',     
-      install_requires=['python-libsbml>=5.15.0'],
+      install_requires=['python-libsbml>=5.16.0'],
       license='MIT',
       packages=['simplesbml', 'simplesbml/tests'],
       include_package_data=True,
       classifiers=[
        'License :: OSI Approved :: MIT License',
+       'Programming Language :: Python :: 3.6',
        'Programming Language :: Python :: 3.7',
        'Programming Language :: Python :: 3.8',
        'Programming Language :: Python :: 3.9',
        'Operating System :: OS Independent',
       ],
-      python_requires='>=3.7',)
+      python_requires='>=3.6',)

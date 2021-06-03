@@ -20,7 +20,7 @@ SBML main page: http://sbml.org/Main_Page
 
 ## Versions: 
 
-The current version is 2.0.0. Compared to 1.2.x series, this adds 'get' functions to interrogate an existing SBML model.
+The current version is 2.2.0. Compared to 1.2.x series, this adds 'get' functions to interrogate an existing SBML model.
 
 # How to install SimpleSBML
 
@@ -31,7 +31,7 @@ pip install simplesbml
 ```
 # Python version support
 
-SimpleSBML in theory supports Python versions 2.7, 3.3, 3.4, 3.5, and 3.6. It definitely supports Python 3.7 and most likely 3.8. SimpleSBML is a pure Python package, but relies on libSBML, which must be compiled for each supported version.
+SimpleSBML in theory supports Python versions 2.7, 3.3, 3.4, and 3.5. It definitely supports Python 3.6, 3.7 and 3.8. SimpleSBML is a pure Python package, but relies on libSBML, which must be compiled for each supported version.
 
 # Help
 
