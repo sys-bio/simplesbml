@@ -20,7 +20,7 @@ SBML main page: http://sbml.org/Main_Page
 
 ## Versions: 
 
-The current version is 2.2.0. Compared to 1.2.x series, this adds 'get' functions to interrogate an existing SBML model.
+The current version is 2.3.0. Compared to 1.2.x series, this adds 'get' functions to interrogate an existing SBML model.
 
 # How to install SimpleSBML
 
